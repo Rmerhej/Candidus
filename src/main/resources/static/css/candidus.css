@@ -126,7 +126,7 @@ img, svg { vertical-align: middle; }
 .lead { font-size: clamp(18px, 2.2vw, 21px); color: var(--ink-muted); max-width: 660px; }
 .muted { color: var(--ink-muted); }
 .small { font-size: 14px; }
-.highlight { background: linear-gradient(transparent 56%, var(--brand-tint) 56%, var(--brand-tint) 92%, transparent 92%); padding: 0 4px; }
+.highlight { background: linear-gradient(transparent 56%, var(--brand-tint) 56%, var(--brand-tint) 92%, transparent 92%); -webkit-box-decoration-break: clone; box-decoration-break: clone; }
 .verb-trouver { color: var(--brand); }
 .verb-ecrire { color: var(--verb-ecrire); }
 .verb-relancer { color: var(--verb-relancer); }
@@ -141,7 +141,7 @@ img, svg { vertical-align: middle; }
 .row { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; }
 .row-between { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; justify-content: space-between; }
 .grid-2 { display: grid; gap: 20px; grid-template-columns: repeat(auto-fit, minmax(min(100%, 420px), 1fr)); align-items: start; }
-.grid-stats { display: grid; gap: 12px; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); }
+.grid-stats { display: grid; gap: 12px; grid-template-columns: repeat(3, minmax(0, 1fr)); }
 .narrow { max-width: 720px; width: 100%; margin: 0 auto; }
 
 @media (min-width: 900px) {
@@ -217,6 +217,7 @@ img, svg { vertical-align: middle; }
 .btn-block { width: 100%; }
 .btn-icon { width: 44px; padding: 0; }
 .btn[disabled] { opacity: .65; cursor: progress; }
+.btn-compact { white-space: nowrap; }
 
 /* ----- Cartes ----- */
 
@@ -228,7 +229,7 @@ img, svg { vertical-align: middle; }
 .card-chalk { border: 2px dashed var(--chalk-line); border-radius: var(--radius-lg); padding: 20px; }
 
 .stat { display: flex; flex-direction: column; gap: 4px; }
-.stat-number { font-size: 36px; font-weight: 900; line-height: 1; }
+.stat-number { font-size: clamp(28px, 7vw, 36px); font-weight: 900; line-height: 1; }
 
 /* ----- Progression ----- */
 
@@ -276,7 +277,10 @@ a.item:hover { border-color: var(--field-border); }
 
 /* ----- Pastilles de filtre ----- */
 
-.chips { display: flex; flex-wrap: wrap; gap: 8px; }
+.chips { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 4px; margin: 0 -20px; padding-left: 20px; padding-right: 20px; scrollbar-width: none; }
+.chips::-webkit-scrollbar { display: none; }
+.chip { flex-shrink: 0; }
+@media (min-width: 900px) { .chips { flex-wrap: wrap; overflow: visible; margin: 0; padding: 0; } }
 .chip {
     min-height: 40px; padding: 0 16px; border-radius: var(--radius-pill); display: inline-flex; align-items: center;
     border: 2px solid var(--field-border); background: var(--ground); color: var(--ink);
@@ -304,8 +308,20 @@ a.item:hover { border-color: var(--field-border); }
 .form-grid { display: grid; gap: 16px; grid-template-columns: repeat(auto-fit, minmax(min(100%, 240px), 1fr)); }
 .form-grid .full { grid-column: 1 / -1; }
 
-.search-row { display: flex; gap: 10px; flex-wrap: wrap; }
-.search-row .input { flex: 1 1 220px; }
+.search-row { display: flex; gap: 10px; }
+.search-row .input { flex: 1 1 auto; min-width: 0; }
+.search-row .btn { flex-shrink: 0; }
+
+/* Champs posés sur une carte grise : fond blanc pour qu'ils se détachent */
+.card .input, .card .select, .card .textarea { background: var(--ground); }
+
+/* Sur téléphone, les boutons d'action prennent toute la largeur */
+@media (max-width: 599px) {
+    .actions-stack { flex-direction: column; align-items: stretch; }
+    .actions-stack > .btn, .actions-stack > form, .actions-stack > form .btn { width: 100%; }
+    .hide-mobile { display: none; }
+    .btn-compact { min-height: 40px; padding: 0 14px; font-size: 15px; }
+}
 
 /* ----- Entreprises à cocher ----- */
 

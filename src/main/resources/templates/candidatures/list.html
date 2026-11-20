@@ -9,10 +9,10 @@
 <main class="container page">
     <th:block th:replace="~{fragments/layout :: flash}"></th:block>
 
-    <div class="row-between">
+    <div class="row-between" style="flex-wrap: nowrap">
         <h1 class="title">Mes candidatures</h1>
-        <a th:href="@{/candidatures/nouvelle}" class="btn btn-primary">
-            <svg class="icon" aria-hidden="true"><use href="#i-plus"></use></svg> Ajouter
+        <a th:href="@{/candidatures/nouvelle}" class="btn btn-primary" aria-label="Ajouter une candidature">
+            <svg class="icon" aria-hidden="true"><use href="#i-plus"></use></svg> <span class="hide-mobile">Ajouter</span>
         </a>
     </div>
 
@@ -21,8 +21,8 @@
         <input type="hidden" name="statut" th:if="${statut != null}" th:value="${statut}">
         <label for="q" class="sr-only">Rechercher</label>
         <input type="search" id="q" name="q" th:value="${q}" class="input" placeholder="Entreprise, poste ou ville">
-        <button type="submit" class="btn btn-secondary">
-            <svg class="icon" aria-hidden="true"><use href="#i-search"></use></svg> Rechercher
+        <button type="submit" class="btn btn-secondary" aria-label="Rechercher">
+            <svg class="icon" aria-hidden="true"><use href="#i-search"></use></svg> <span class="hide-mobile">Rechercher</span>
         </button>
     </form>
 

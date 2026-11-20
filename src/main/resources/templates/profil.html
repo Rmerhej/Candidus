@@ -30,13 +30,13 @@
                 <div class="field">
                     <label for="metierVise">Métier visé</label>
                     <input type="text" th:field="*{metierVise}" class="input" th:errorclass="is-invalid"
-                           placeholder="Ex : formateur pour adultes, aide-soignant, comptable">
+                           placeholder="Ex : formateur, aide-soignant">
                     <span class="error" th:if="${#fields.hasErrors('metierVise')}" th:errors="*{metierVise}"></span>
                 </div>
                 <div class="field">
                     <label for="motsCles">Type d'entreprises à chercher</label>
                     <input type="text" th:field="*{motsCles}" class="input" th:errorclass="is-invalid"
-                           placeholder="Ex : organisme de formation, maison de retraite">
+                           placeholder="Ex : organisme de formation">
                     <span class="help">Ces mots servent à chercher les entreprises dans l'annuaire officiel.</span>
                     <span class="error" th:if="${#fields.hasErrors('motsCles')}" th:errors="*{motsCles}"></span>
                 </div>

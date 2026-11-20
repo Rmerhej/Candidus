@@ -12,7 +12,9 @@
     <div>
         <p class="hand-xl" th:text="${stats.envoyeesSemaine > 0} ? 'Bravo ' + ${prenom} + ' !' : 'Bonjour ' + ${prenom} + ' !'">Bravo Karim !</p>
         <h1 class="title">
-            <span th:text="${stats.envoyeesSemaine} + (${stats.envoyeesSemaine > 1} ? ' candidatures' : ' candidature') + ' cette semaine.'">3 candidatures cette semaine.</span>
+            <span th:if="${stats.envoyeesSemaine == 0}">Une nouvelle semaine commence.</span>
+            <span th:if="${stats.envoyeesSemaine > 0}"
+                  th:text="${stats.envoyeesSemaine} + (${stats.envoyeesSemaine > 1} ? ' candidatures' : ' candidature') + ' cette semaine.'">3 candidatures cette semaine.</span>
             <span class="highlight" th:text="'Objectif : ' + ${stats.objectifSemaine} + '.'">Objectif : 5.</span>
         </h1>
     </div>
@@ -41,7 +43,7 @@
             <div class="grid-stats" style="margin-top: 4px">
                 <div class="stat">
                     <span class="stat-number" style="color: #FFFFFF" th:text="${stats.envoyees}">12</span>
-                    <span class="small">envoyées en tout</span>
+                    <span class="small">envoyées</span>
                 </div>
                 <div class="stat">
                     <span class="stat-number" style="color: #FFFFFF" th:text="${stats.entretiens}">2</span>
@@ -80,7 +82,7 @@
         </section>
     </div>
 
-    <div class="row">
+    <div class="row actions-stack">
         <a th:href="@{/entreprises}" class="btn btn-secondary btn-lg">
             <svg class="icon" aria-hidden="true"><use href="#i-pin"></use></svg> Trouver des entreprises
         </a>

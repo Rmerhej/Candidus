@@ -38,69 +38,6 @@
 
     <div class="grid-2">
 
-        <!-- Colonne suivi -->
-        <div class="stack">
-            <div th:if="${candidature.relanceDue}" class="flash flash-error" role="status">
-                <svg class="icon" aria-hidden="true"><use href="#i-bell"></use></svg>
-                <span>C'est le moment de relancer cet employeur.</span>
-            </div>
-
-            <form th:if="${candidature.statut.name() == 'A_ENVOYER'}"
-                  th:action="@{/candidatures/{id}/envoyee(id=${candidature.id})}" method="post">
-                <button type="submit" class="btn btn-primary btn-lg btn-block">
-                    <svg class="icon" aria-hidden="true"><use href="#i-check"></use></svg> Je l'ai envoyée
-                </button>
-            </form>
-            <form th:if="${candidature.statut.name() == 'ENVOYEE' or candidature.statut.name() == 'RELANCEE'}"
-                  th:action="@{/candidatures/{id}/relancee(id=${candidature.id})}" method="post">
-                <button type="submit" class="btn btn-primary btn-lg btn-block">
-                    <svg class="icon" aria-hidden="true"><use href="#i-check"></use></svg> J'ai relancé
-                </button>
-            </form>
-
-            <section class="card stack-sm">
-                <h2 class="hand-m verb-relancer">Le suivi</h2>
-                <div class="row-between small">
-                    <span class="muted">Envoyée le</span>
-                    <strong th:text="${candidature.dateEnvoi != null} ? ${#temporals.format(candidature.dateEnvoi, 'dd/MM/yyyy')} : '—'">—</strong>
-                </div>
-                <div class="row-between small">
-                    <span class="muted">Relance prévue le</span>
-                    <strong th:text="${candidature.dateRelance != null} ? ${#temporals.format(candidature.dateRelance, 'dd/MM/yyyy')} : '—'">—</strong>
-                </div>
-                <div class="row-between small">
-                    <span class="muted">Priorité</span>
-                    <strong th:text="${candidature.qualification} ?: '—'">—</strong>
-                </div>
-                <a th:href="@{/candidatures/{id}/modifier(id=${candidature.id})}" class="btn btn-secondary" style="margin-top: 8px">
-                    <svg class="icon" aria-hidden="true"><use href="#i-pen"></use></svg> Modifier (statut, dates, notes…)
-                </a>
-            </section>
-
-            <section class="card-chalk stack-sm">
-                <h2 class="hand-m verb-trouver">L'entreprise</h2>
-                <p th:if="${candidature.siren}" class="small" style="margin: 0">
-                    <span class="muted">Fiche officielle :</span>
-                    <a th:href="'https://annuaire-entreprises.data.gouv.fr/entreprise/' + ${candidature.siren}"
-                       target="_blank" rel="noopener">SIREN <span th:text="${candidature.siren}">000000000</span></a>
-                </p>
-                <p th:if="${candidature.siteWeb}" class="small" style="margin: 0; overflow-wrap: anywhere">
-                    <span class="muted">Site :</span>
-                    <a th:href="${candidature.siteWeb}" target="_blank" rel="noopener nofollow" th:text="${candidature.siteWeb}">site</a>
-                </p>
-                <p th:if="${candidature.offreUrl}" class="small" style="margin: 0">
-                    <a th:href="${candidature.offreUrl}" target="_blank" rel="noopener nofollow">Voir l'annonce</a>
-                </p>
-                <p th:if="${candidature.notes}" class="small text-pre" style="margin: 0" th:text="${candidature.notes}">Notes</p>
-            </section>
-
-            <form th:action="@{/candidatures/{id}/supprimer(id=${candidature.id})}" method="post" data-confirm="Supprimer définitivement cette candidature ?">
-                <button type="submit" class="btn btn-link">
-                    <svg class="icon" aria-hidden="true"><use href="#i-trash"></use></svg> Supprimer cette candidature
-                </button>
-            </form>
-        </div>
-
         <!-- Colonne IA et lettre -->
         <div class="stack">
             <section class="card-night stack-sm">
@@ -154,6 +91,70 @@
                     Relisez et personnalisez toujours la lettre : c'est vous qui l'envoyez, depuis votre messagerie.
                 </p>
             </section>
+        </div>
+
+        <!-- Colonne suivi -->
+        <div class="stack">
+            <div th:if="${candidature.relanceDue}" class="flash flash-error" role="status">
+                <svg class="icon" aria-hidden="true"><use href="#i-bell"></use></svg>
+                <span>C'est le moment de relancer cet employeur.</span>
+            </div>
+
+            <form th:if="${candidature.statut.name() == 'A_ENVOYER'}"
+                  th:action="@{/candidatures/{id}/envoyee(id=${candidature.id})}" method="post">
+                <button type="submit" class="btn btn-primary btn-lg btn-block">
+                    <svg class="icon" aria-hidden="true"><use href="#i-check"></use></svg> Je l'ai envoyée
+                </button>
+            </form>
+            <form th:if="${candidature.statut.name() == 'ENVOYEE' or candidature.statut.name() == 'RELANCEE'}"
+                  th:action="@{/candidatures/{id}/relancee(id=${candidature.id})}" method="post">
+                <button type="submit" class="btn btn-primary btn-lg btn-block">
+                    <svg class="icon" aria-hidden="true"><use href="#i-check"></use></svg> J'ai relancé
+                </button>
+            </form>
+
+            <section class="card stack-sm">
+                <h2 class="hand-m verb-relancer">Le suivi</h2>
+                <div class="row-between small">
+                    <span class="muted">Envoyée le</span>
+                    <strong th:text="${candidature.dateEnvoi != null} ? ${#temporals.format(candidature.dateEnvoi, 'dd/MM/yyyy')} : '—'">—</strong>
+                </div>
+                <div class="row-between small">
+                    <span class="muted">Relance prévue le</span>
+                    <strong th:text="${candidature.dateRelance != null} ? ${#temporals.format(candidature.dateRelance, 'dd/MM/yyyy')} : '—'">—</strong>
+                </div>
+                <div class="row-between small">
+                    <span class="muted">Priorité</span>
+                    <strong th:text="${candidature.qualification} ?: '—'">—</strong>
+                </div>
+                <a th:href="@{/candidatures/{id}/modifier(id=${candidature.id})}" class="btn btn-secondary" style="margin-top: 8px">
+                    <svg class="icon" aria-hidden="true"><use href="#i-pen"></use></svg> Modifier
+                </a>
+            </section>
+
+            <section class="card-chalk stack-sm"
+                     th:if="${candidature.siren != null or candidature.siteWeb != null or candidature.offreUrl != null or candidature.notes != null}">
+                <h2 class="hand-m verb-trouver">L'entreprise</h2>
+                <p th:if="${candidature.siren}" class="small" style="margin: 0">
+                    <span class="muted">Fiche officielle :</span>
+                    <a th:href="'https://annuaire-entreprises.data.gouv.fr/entreprise/' + ${candidature.siren}"
+                       target="_blank" rel="noopener">SIREN <span th:text="${candidature.siren}">000000000</span></a>
+                </p>
+                <p th:if="${candidature.siteWeb}" class="small" style="margin: 0; overflow-wrap: anywhere">
+                    <span class="muted">Site :</span>
+                    <a th:href="${candidature.siteWeb}" target="_blank" rel="noopener nofollow" th:text="${candidature.siteWeb}">site</a>
+                </p>
+                <p th:if="${candidature.offreUrl}" class="small" style="margin: 0">
+                    <a th:href="${candidature.offreUrl}" target="_blank" rel="noopener nofollow">Voir l'annonce</a>
+                </p>
+                <p th:if="${candidature.notes}" class="small text-pre" style="margin: 0" th:text="${candidature.notes}">Notes</p>
+            </section>
+
+            <form th:action="@{/candidatures/{id}/supprimer(id=${candidature.id})}" method="post" data-confirm="Supprimer définitivement cette candidature ?">
+                <button type="submit" class="btn btn-link">
+                    <svg class="icon" aria-hidden="true"><use href="#i-trash"></use></svg> Supprimer cette candidature
+                </button>
+            </form>
         </div>
     </div>
 </main>
