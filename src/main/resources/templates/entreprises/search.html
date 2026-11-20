@@ -32,6 +32,11 @@
             <a th:href="@{/profil}">Modifier</a>
         </div>
 
+        <p th:if="${result != null and result.elargie(profil.motsCles)}" class="small muted" style="margin: 0">
+            Aucune entreprise ne porte « <span th:text="${profil.motsCles}">organisme de formation</span> » dans son nom :
+            voici les résultats pour « <strong th:text="${result.requete()}">formation</strong> ».
+        </p>
+
         <div th:if="${result != null and #lists.isEmpty(result.candidates())}" class="card-chalk muted" style="text-align: center">
             Aucune entreprise trouvée. Essayez des mots plus larges dans votre profil (par exemple « formation » plutôt qu'un nom précis).
         </div>

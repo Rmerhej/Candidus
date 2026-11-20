@@ -11,8 +11,14 @@ public record CompanySearchResult(
         List<CompanyCandidate> candidates,
         int page,
         int totalPages,
-        int totalResults
+        int totalResults,
+        String requete
 ) {
+
+    /** Vrai si la recherche a été élargie à un seul mot faute de résultat avec la phrase complète. */
+    public boolean elargie(String motsCles) {
+        return requete != null && motsCles != null && !requete.equalsIgnoreCase(motsCles.strip());
+    }
 
     public boolean hasPrevious() {
         return page > 1;

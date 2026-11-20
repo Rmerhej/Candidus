@@ -415,7 +415,8 @@ a.item:hover { border-color: var(--field-border); }
     border-radius: 36px;
 }
 .phone {
-    width: 290px; border-radius: 40px; padding: 12px; background: var(--ink);
+    width: 290px; border-radius: 40px; padding: 12px; background: #0B1B3F;
+    border: 1px solid var(--chalk-line);
     box-shadow: 0 30px 60px rgba(11, 27, 63, .25);
 }
 .phone-screen {

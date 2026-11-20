@@ -50,7 +50,8 @@ public class CompanyImportService {
     /** Une page de résultats, en signalant les entreprises que l'utilisateur a déjà importées. */
     public CompanySearchResult search(Long utilisateurId, Profil profil, int page) {
         int safePage = clampPage(page);
-        ApiSearchResponse response = client.search(profil.getMotsCles(), profil.getDepartementsList(), safePage);
+        String requete = requeteEffective(profil);
+        ApiSearchResponse response = client.search(requete, profil.getDepartementsList(), safePage);
         List<ApiCompany> companies = response == null ? List.of() : response.safeResults();
 
         Set<String> existing = findExisting(utilisateurId, companies.stream().map(ApiCompany::siren).toList());
@@ -66,7 +67,8 @@ public class CompanyImportService {
                 candidates,
                 safePage,
                 Math.min(totalPages, RechercheEntreprisesClient.MAX_PAGE),
-                totalResults);
+                totalResults,
+                requete);
     }
 
     /**
@@ -86,7 +88,7 @@ public class CompanyImportService {
             return new ImportReport(0, 0, 0);
         }
 
-        ApiSearchResponse response = client.search(profil.getMotsCles(), profil.getDepartementsList(),
+        ApiSearchResponse response = client.search(requeteEffective(profil), profil.getDepartementsList(),
                 clampPage(page));
         List<ApiCompany> companies = response == null ? List.of() : response.safeResults();
 
@@ -108,6 +110,35 @@ public class CompanyImportService {
 
         int notFound = wanted.size() - selected.size();
         return new ImportReport(toSave.size(), selected.size() - toSave.size(), notFound);
+    }
+
+    /** Mots trop courants pour servir seuls à une recherche. */
+    private static final Set<String> MOTS_VIDES = Set.of(
+            "organisme", "organismes", "entreprise", "entreprises", "societe", "société", "cabinet",
+            "centre", "centres", "maison", "service", "services", "agence", "groupe");
+
+    /**
+     * L'API cherche surtout dans les NOMS des entreprises : « organisme de formation » ne trouve
+     * presque rien, alors que « formation » trouve des milliers d'entreprises.
+     * Si la phrase complète ne donne aucun résultat, on garde son mot le plus parlant.
+     * (Une seule requête de vérification, page 1, pour décider.)
+     */
+    String requeteEffective(Profil profil) {
+        String motsCles = profil.getMotsCles() == null ? "" : profil.getMotsCles().strip();
+        String[] mots = motsCles.split("\\s+");
+        if (mots.length < 2) {
+            return motsCles;
+        }
+        ApiSearchResponse essai = client.search(motsCles, profil.getDepartementsList(), 1);
+        if (essai != null && essai.totalResults() != null && essai.totalResults() > 0) {
+            return motsCles;
+        }
+        return java.util.Arrays.stream(mots)
+                .map(String::strip)
+                .filter(m -> m.length() >= 4)
+                .filter(m -> !MOTS_VIDES.contains(m.toLowerCase(java.util.Locale.ROOT)))
+                .max(java.util.Comparator.comparingInt(String::length))
+                .orElse(motsCles);
     }
 
     // ----- Conversions -----
