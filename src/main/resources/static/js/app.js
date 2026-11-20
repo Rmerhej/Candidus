@@ -105,3 +105,38 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     });
 });
+
+// Préchargement au survol pour les navigateurs sans « speculation rules » (Firefox, Safari…) :
+// dès que la souris s'attarde ou que le doigt touche un lien interne, on demande la page en avance.
+(() => {
+    if (window.HTMLScriptElement && HTMLScriptElement.supports && HTMLScriptElement.supports("speculationrules")) {
+        return;
+    }
+    const dejaPrecharge = new Set();
+    let minuteur = null;
+
+    const precharger = lien => {
+        if (!lien || lien.origin !== location.origin || lien.hasAttribute("data-no-prefetch")) {
+            return;
+        }
+        const url = lien.href.split("#")[0];
+        if (url === location.href.split("#")[0] || dejaPrecharge.has(url) || url.endsWith("/logout")) {
+            return;
+        }
+        dejaPrecharge.add(url);
+        const link = document.createElement("link");
+        link.rel = "prefetch";
+        link.href = url;
+        document.head.appendChild(link);
+    };
+
+    document.addEventListener("mouseover", event => {
+        const lien = event.target.closest("a[href]");
+        clearTimeout(minuteur);
+        // Un petit délai : on ne précharge pas tout ce que la souris traverse
+        minuteur = setTimeout(() => precharger(lien), 120);
+    });
+    document.addEventListener("touchstart", event => {
+        precharger(event.target.closest("a[href]"));
+    }, { passive: true });
+})();

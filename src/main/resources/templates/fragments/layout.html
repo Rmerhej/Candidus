@@ -23,6 +23,20 @@
           rel="stylesheet">
     <link th:href="@{/css/candidus.css}" rel="stylesheet">
     <script th:src="@{/js/app.js}" defer></script>
+    <!-- Préchargement au survol : la page suivante est prête avant le clic (Chrome, Edge…).
+         Seulement des liens internes en lecture : toutes les actions passent par des formulaires POST. -->
+    <script type="speculationrules">
+        {
+          "prefetch": [{
+            "where": { "and": [
+              { "href_matches": "/*" },
+              { "not": { "href_matches": "/logout" } },
+              { "not": { "selector_matches": "[data-no-prefetch]" } }
+            ] },
+            "eagerness": "moderate"
+          }]
+        }
+    </script>
 </head>
 
 <body>
