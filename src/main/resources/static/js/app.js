@@ -74,3 +74,34 @@ document.addEventListener("DOMContentLoaded", () => {
     window.addEventListener("resize", maj);
     maj();
 });
+
+// Mots de passe : un bouton « œil » pour afficher ou masquer ce qu'on tape
+document.addEventListener("DOMContentLoaded", () => {
+    document.querySelectorAll('input[type="password"]').forEach(input => {
+        const conteneur = document.createElement("div");
+        conteneur.className = "password-field";
+        input.parentNode.insertBefore(conteneur, input);
+        conteneur.appendChild(input);
+
+        const bouton = document.createElement("button");
+        bouton.type = "button";
+        bouton.className = "password-toggle";
+        conteneur.appendChild(bouton);
+
+        const afficher = visible => {
+            input.type = visible ? "text" : "password";
+            bouton.setAttribute("aria-pressed", String(visible));
+            bouton.setAttribute("aria-label", visible ? "Masquer le mot de passe" : "Afficher le mot de passe");
+            bouton.innerHTML = '<svg class="icon" aria-hidden="true"><use href="#' + (visible ? "i-eye-off" : "i-eye") + '"></use></svg>';
+        };
+        afficher(false);
+        bouton.addEventListener("click", () => {
+            afficher(input.type === "password");
+            input.focus();
+        });
+        // Par sécurité, on remasque le mot de passe à l'envoi du formulaire
+        if (input.form) {
+            input.form.addEventListener("submit", () => { input.type = "password"; });
+        }
+    });
+});
