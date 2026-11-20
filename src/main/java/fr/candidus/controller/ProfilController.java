@@ -24,6 +24,12 @@ public class ProfilController {
         this.profilService = profilService;
     }
 
+    /** Pourcentage de profil complété, affiché en haut de la page (aussi après une erreur de saisie). */
+    @ModelAttribute("completion")
+    public int completion(@AuthenticationPrincipal CandidusUser user) {
+        return profilService.getOrCreate(user.getId()).getCompletion();
+    }
+
     @GetMapping
     public String showForm(@AuthenticationPrincipal CandidusUser user, Model model) {
         model.addAttribute("profil", ProfilForm.fromEntity(profilService.getOrCreate(user.getId())));

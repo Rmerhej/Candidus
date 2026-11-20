@@ -72,6 +72,13 @@ public class Profil {
         return motsCles != null && !motsCles.isBlank() && !getDepartementsList().isEmpty();
     }
 
+    /** Pourcentage de champs remplis (0 à 100), pour la jauge « Profil complété ». */
+    public int getCompletion() {
+        String[] champs = {metierVise, motsCles, departements, cvResume, pointsForts, telephone, lienProfil};
+        long remplis = java.util.Arrays.stream(champs).filter(c -> c != null && !c.isBlank()).count();
+        return (int) Math.round(remplis * 100.0 / champs.length);
+    }
+
     public Long getId() {
         return id;
     }

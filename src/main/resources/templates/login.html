@@ -2,58 +2,56 @@
 <html lang="fr" xmlns:th="http://www.thymeleaf.org">
 <head th:replace="~{fragments/layout :: head('Connexion')}"></head>
 
-<body class="bg-light">
+<body>
+<svg th:replace="~{fragments/layout :: icons}"></svg>
 
-<main class="container py-5">
-    <div class="row justify-content-center">
-        <div class="col-md-6 col-lg-4">
+<main class="auth">
+    <div class="auth-box">
+        <div class="row-between">
+            <a th:replace="~{fragments/layout :: logo(@{/})}"></a>
+            <button th:replace="~{fragments/layout :: themeToggle}"></button>
+        </div>
 
-            <div class="text-center mb-4">
-                <a th:href="@{/}" class="text-decoration-none">
-                    <i class="bi bi-briefcase display-5 text-primary"></i>
-                    <h1 class="h4 mt-2 text-dark">Candidus</h1>
-                </a>
+        <div>
+            <p class="hand-xl">Content de vous revoir !</p>
+            <h1 class="title">Connexion</h1>
+        </div>
+
+        <div th:if="${param.error}" class="flash flash-error" role="alert">
+            <svg class="icon" aria-hidden="true"><use href="#i-alert"></use></svg>
+            <span>Adresse e-mail ou mot de passe incorrect.</span>
+        </div>
+        <div th:if="${param.logout}" class="flash flash-success" role="status">
+            <svg class="icon" aria-hidden="true"><use href="#i-check"></use></svg>
+            <span>Vous êtes déconnecté. À bientôt !</span>
+        </div>
+        <div th:if="${param.inscrit}" class="flash flash-success" role="status">
+            <svg class="icon" aria-hidden="true"><use href="#i-check"></use></svg>
+            <span>Compte créé ! Connectez-vous pour commencer.</span>
+        </div>
+
+        <!-- th:action ajoute automatiquement le jeton CSRF caché -->
+        <form th:action="@{/login}" method="post" class="stack">
+            <div class="field">
+                <label for="email">Adresse e-mail</label>
+                <input type="email" id="email" name="email" class="input" autocomplete="username" required autofocus>
             </div>
-
-            <div class="card border-0 shadow-sm">
-                <div class="card-body p-4">
-
-                    <div th:if="${param.error}" class="alert alert-danger py-2" role="alert">
-                        Adresse e-mail ou mot de passe incorrect.
-                    </div>
-                    <div th:if="${param.logout}" class="alert alert-success py-2" role="alert">
-                        Vous êtes déconnecté.
-                    </div>
-                    <div th:if="${param.inscrit}" class="alert alert-success py-2" role="alert">
-                        Compte créé ! Connectez-vous pour commencer.
-                    </div>
-
-                    <!-- th:action ajoute automatiquement le jeton CSRF caché -->
-                    <form th:action="@{/login}" method="post">
-                        <div class="mb-3">
-                            <label for="email" class="form-label">Adresse e-mail</label>
-                            <input type="email" id="email" name="email" class="form-control"
-                                   autocomplete="username" required autofocus>
-                        </div>
-                        <div class="mb-4">
-                            <label for="password" class="form-label">Mot de passe</label>
-                            <input type="password" id="password" name="password" class="form-control"
-                                   autocomplete="current-password" required>
-                        </div>
-                        <button type="submit" class="btn btn-primary w-100">
-                            <i class="bi bi-box-arrow-in-right"></i> Se connecter
-                        </button>
-                    </form>
-
-                    <p class="text-center small mt-3 mb-0">
-                        Pas encore de compte ? <a th:href="@{/inscription}">Créer un compte</a>
-                    </p>
-                </div>
+            <div class="field">
+                <label for="password">Mot de passe</label>
+                <input type="password" id="password" name="password" class="input" autocomplete="current-password" required>
             </div>
+            <button type="submit" class="btn btn-primary btn-lg btn-block">Se connecter</button>
+        </form>
 
+        <p class="muted" style="margin: 0; text-align: center">
+            Pas encore de compte ? <a th:href="@{/inscription}">Créer mon compte</a>
+        </p>
+
+        <div class="card-night stack-sm">
+            <span class="hand" style="font-size: 30px; color: #FFFFFF">candidus</span>
+            <span class="small">Blanc éclatant, sincère. Comme votre candidature.</span>
         </div>
     </div>
 </main>
-
 </body>
 </html>

@@ -81,7 +81,11 @@ class CandidatureWebTest {
 
         Candidature reloaded = candidatureRepository.findById(c.getId()).orElseThrow();
         assertEquals(StatutCandidature.ENVOYEE, reloaded.getStatut());
-        assertEquals(LocalDate.now().plusDays(7), reloaded.getDateRelance());
+        assertEquals(LocalDate.now(java.time.ZoneId.of("Europe/Paris")).plusDays(7), reloaded.getDateRelance());
+
+        // Elle compte dans l'objectif de la semaine du tableau de bord
+        mockMvc.perform(get("/tableau-de-bord").with(user(alice)))
+                .andExpect(content().string(containsString("1 candidature cette semaine.")));
     }
 
     @Test
@@ -123,7 +127,8 @@ class CandidatureWebTest {
     void lesPagesPrincipalesSAffichent() throws Exception {
         Candidature c = creerCandidature(alice, "Affichage SAS");
         for (String url : new String[]{"/tableau-de-bord", "/candidatures", "/candidatures/nouvelle",
-                "/candidatures/" + c.getId(), "/candidatures/" + c.getId() + "/modifier", "/profil"}) {
+                "/candidatures/" + c.getId(), "/candidatures/" + c.getId() + "/modifier", "/profil",
+                "/entreprises"}) {
             mockMvc.perform(get(url).with(user(alice)))
                     .andExpect(status().isOk());
         }

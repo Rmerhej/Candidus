@@ -1,62 +1,58 @@
 <!DOCTYPE html>
 <html lang="fr" xmlns:th="http://www.thymeleaf.org">
-<head th:replace="~{fragments/layout :: head('Bienvenue')}"></head>
+<head th:replace="~{fragments/layout :: head('Votre candidature, en pleine lumière')}"></head>
 
-<body class="bg-light">
+<body>
+<svg th:replace="~{fragments/layout :: icons}"></svg>
 
-<nav class="navbar navbar-dark bg-primary">
+<header class="site-header">
     <div class="container">
-        <span class="navbar-brand fw-bold"><i class="bi bi-briefcase"></i> Candidus</span>
-        <a th:href="@{/login}" class="btn btn-outline-light btn-sm">Se connecter</a>
+        <a th:replace="~{fragments/layout :: logo(@{/})}"></a>
+        <div class="header-actions">
+            <button th:replace="~{fragments/layout :: themeToggle}"></button>
+            <a th:href="@{/login}" class="btn btn-outline">Se connecter</a>
+        </div>
     </div>
-</nav>
+</header>
 
-<main class="container py-5">
-    <div class="row justify-content-center text-center">
-        <div class="col-lg-8">
-            <h1 class="display-5 fw-bold mb-3">Votre recherche d'emploi, enfin organisée</h1>
-            <p class="lead text-secondary mb-4">
-                Suivez vos candidatures, trouvez les entreprises qui recrutent près de chez vous,
-                et préparez vos lettres avec l'aide de l'IA. Vous relisez, vous envoyez : vous gardez la main.
+<main class="container">
+    <section class="hero">
+        <p class="hand-xl">Chaque jour, un pas de plus.</p>
+        <h1 class="display">Votre candidature,<br><span class="highlight">en pleine lumière.</span></h1>
+        <p class="lead">
+            Les entreprises près de chez vous, des lettres préparées par l'IA, des relances au bon moment.
+            Et des encouragements, parce qu'on en a besoin. C'est vous qui envoyez.
+        </p>
+        <div class="row">
+            <a th:href="@{/inscription}" class="btn btn-primary btn-lg">Créer mon compte</a>
+            <span class="hand" style="font-size: 26px; color: var(--ink-muted)">c'est gratuit pour commencer</span>
+        </div>
+    </section>
+
+    <section class="bento" aria-label="Ce que fait Candidus">
+        <div class="card-night wide stack">
+            <div class="row" style="align-items: baseline">
+                <span class="hand" style="font-size: 44px; color: #FFFFFF">candidus</span>
+                <em class="small" style="color: var(--night-muted)">adj. latin</em>
+            </div>
+            <p style="margin: 0">
+                <strong>1. Blanc éclatant.</strong> À Rome, le candidat blanchissait sa toge à la craie pour être vu
+                de tous. <strong>2. Sincère, franc.</strong> Deux qualités qu'on vous aide à montrer.
             </p>
-            <a th:href="@{/inscription}" class="btn btn-primary btn-lg">
-                <i class="bi bi-person-plus"></i> Créer mon compte
-            </a>
         </div>
-    </div>
-
-    <div class="row g-4 mt-4">
-        <div class="col-md-4">
-            <div class="card border-0 shadow-sm h-100">
-                <div class="card-body p-4">
-                    <i class="bi bi-list-check display-6 text-primary"></i>
-                    <h2 class="h5 mt-3">Un suivi clair</h2>
-                    <p class="text-secondary mb-0">Chaque candidature a son statut, et Candidus vous rappelle
-                        quand relancer.</p>
-                </div>
-            </div>
+        <div class="card-chalk stack-sm">
+            <span class="hand-m verb-trouver">Trouver</span>
+            <p class="muted" style="margin: 0">des employeurs près de chez vous, même sans offre publiée.</p>
         </div>
-        <div class="col-md-4">
-            <div class="card border-0 shadow-sm h-100">
-                <div class="card-body p-4">
-                    <i class="bi bi-building display-6 text-primary"></i>
-                    <h2 class="h5 mt-3">Des entreprises près de chez vous</h2>
-                    <p class="text-secondary mb-0">Trouvez des employeurs par métier et par département,
-                        même sans offre publiée.</p>
-                </div>
-            </div>
+        <div class="card stack-sm">
+            <span class="hand-m verb-ecrire">Écrire</span>
+            <p class="muted" style="margin: 0">des lettres avec l'IA, à votre façon.</p>
         </div>
-        <div class="col-md-4">
-            <div class="card border-0 shadow-sm h-100">
-                <div class="card-body p-4">
-                    <i class="bi bi-pencil-square display-6 text-primary"></i>
-                    <h2 class="h5 mt-3">Des lettres sur mesure</h2>
-                    <p class="text-secondary mb-0">L'IA prépare un brouillon à partir de votre profil.
-                        Rien n'est envoyé sans vous.</p>
-                </div>
-            </div>
+        <div class="card stack-sm">
+            <span class="hand-m verb-relancer">Relancer</span>
+            <p class="muted" style="margin: 0">au bon moment, sans rien oublier.</p>
         </div>
-    </div>
+    </section>
 </main>
 
 <footer th:replace="~{fragments/layout :: footer}"></footer>

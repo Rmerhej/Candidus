@@ -21,6 +21,9 @@ import java.util.Set;
 @Service
 public class DashboardService {
 
+    /** Nombre de candidatures à envoyer chaque semaine pour garder le rythme. */
+    public static final int OBJECTIF_SEMAINE = 5;
+
     private final CandidatureRepository candidatureRepository;
     private final Clock clock;
 
@@ -52,6 +55,9 @@ public class DashboardService {
             parStatut.add(new CountItem(statut.getLibelle(), nombre, pourcentage, statut.getCouleur()));
         }
 
+        LocalDate aujourdhui = LocalDate.now(clock);
+        LocalDate lundi = aujourdhui.with(java.time.temporal.TemporalAdjusters.previousOrSame(java.time.DayOfWeek.MONDAY));
+
         return new DashboardStats(
                 total,
                 envoyees,
@@ -60,7 +66,9 @@ public class DashboardService {
                 percentOrNull(reponses, envoyees),
                 parStatut,
                 candidatureRepository.findRelancesDues(
-                        utilisateurId, StatutCandidature.EN_ATTENTE, LocalDate.now(clock)));
+                        utilisateurId, StatutCandidature.EN_ATTENTE, aujourdhui),
+                candidatureRepository.countByUtilisateurIdAndDateEnvoiGreaterThanEqual(utilisateurId, lundi),
+                OBJECTIF_SEMAINE);
     }
 
     private static long sum(Map<StatutCandidature, Long> counts, Set<StatutCandidature> statuts) {

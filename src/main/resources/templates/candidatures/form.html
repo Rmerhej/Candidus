@@ -2,99 +2,90 @@
 <html lang="fr" xmlns:th="http://www.thymeleaf.org">
 <head th:replace="~{fragments/layout :: head('Candidature')}"></head>
 
-<body class="bg-light">
+<body>
+<svg th:replace="~{fragments/layout :: icons}"></svg>
+<header th:replace="~{fragments/layout :: header('candidatures')}"></header>
 
-<nav th:replace="~{fragments/layout :: navbar}"></nav>
+<main class="container page">
+    <div class="narrow stack">
+        <a th:href="${candidature.id == null} ? @{/candidatures} : @{/candidatures/{id}(id=${candidature.id})}"
+           class="small" style="text-decoration: none; color: var(--ink-muted)">
+            <svg class="icon" aria-hidden="true" style="width: 18px; height: 18px"><use href="#i-back"></use></svg> Retour
+        </a>
+        <h1 class="title" th:text="${candidature.id == null} ? 'Nouvelle candidature' : 'Modifier la candidature'">Candidature</h1>
 
-<main class="container py-4">
-    <div class="row justify-content-center">
-        <div class="col-lg-8">
+        <form th:action="@{/candidatures}" th:object="${candidature}" method="post" novalidate class="stack">
+            <input type="hidden" th:field="*{id}">
 
-            <h1 class="h3 mb-4"
-                th:text="${candidature.id == null} ? 'Nouvelle candidature' : 'Modifier la candidature'">Candidature</h1>
-
-            <form th:action="@{/candidatures}" th:object="${candidature}" method="post" novalidate
-                  class="card border-0 shadow-sm">
-                <div class="card-body p-4">
-                    <input type="hidden" th:field="*{id}">
-
-                    <div class="row g-3">
-                        <div class="col-md-6">
-                            <label for="entreprise" class="form-label">Entreprise *</label>
-                            <input type="text" th:field="*{entreprise}" class="form-control"
-                                   th:classappend="${#fields.hasErrors('entreprise')} ? 'is-invalid'" required>
-                            <div class="invalid-feedback" th:errors="*{entreprise}"></div>
-                        </div>
-                        <div class="col-md-6">
-                            <label for="poste" class="form-label">Poste visé</label>
-                            <input type="text" th:field="*{poste}" class="form-control"
-                                   th:classappend="${#fields.hasErrors('poste')} ? 'is-invalid'">
-                            <div class="invalid-feedback" th:errors="*{poste}"></div>
-                        </div>
-                        <div class="col-12">
-                            <label for="offreUrl" class="form-label">Lien de l'offre (si elle existe)</label>
-                            <input type="url" th:field="*{offreUrl}" class="form-control" placeholder="https://"
-                                   th:classappend="${#fields.hasErrors('offreUrl')} ? 'is-invalid'">
-                            <div class="invalid-feedback" th:errors="*{offreUrl}"></div>
-                        </div>
-                        <div class="col-md-6">
-                            <label for="siteWeb" class="form-label">Site de l'entreprise</label>
-                            <input type="url" th:field="*{siteWeb}" class="form-control" placeholder="https://"
-                                   th:classappend="${#fields.hasErrors('siteWeb')} ? 'is-invalid'">
-                            <div class="invalid-feedback" th:errors="*{siteWeb}"></div>
-                        </div>
-                        <div class="col-md-4">
-                            <label for="ville" class="form-label">Ville</label>
-                            <input type="text" th:field="*{ville}" class="form-control"
-                                   th:classappend="${#fields.hasErrors('ville')} ? 'is-invalid'">
-                            <div class="invalid-feedback" th:errors="*{ville}"></div>
-                        </div>
-                        <div class="col-md-2">
-                            <label for="codePostal" class="form-label">Code postal</label>
-                            <input type="text" th:field="*{codePostal}" class="form-control" inputmode="numeric"
-                                   th:classappend="${#fields.hasErrors('codePostal')} ? 'is-invalid'">
-                            <div class="invalid-feedback" th:errors="*{codePostal}"></div>
-                        </div>
-
-                        <div class="col-md-4">
-                            <label for="statut" class="form-label">Statut</label>
-                            <select th:field="*{statut}" class="form-select"
-                                    th:classappend="${#fields.hasErrors('statut')} ? 'is-invalid'">
-                                <option th:each="s : ${statuts}" th:value="${s}" th:text="${s.libelle}">Statut</option>
-                            </select>
-                            <div class="invalid-feedback" th:errors="*{statut}"></div>
-                        </div>
-                        <div class="col-md-4">
-                            <label for="dateEnvoi" class="form-label">Date d'envoi</label>
-                            <input type="date" th:field="*{dateEnvoi}" class="form-control">
-                        </div>
-                        <div class="col-md-4">
-                            <label for="dateRelance" class="form-label">Date de relance</label>
-                            <input type="date" th:field="*{dateRelance}" class="form-control">
-                            <div class="form-text">Calculée automatiquement si vous la laissez vide.</div>
-                        </div>
-
-                        <div class="col-12">
-                            <label for="notes" class="form-label">Notes</label>
-                            <textarea th:field="*{notes}" class="form-control" rows="4"
-                                      th:classappend="${#fields.hasErrors('notes')} ? 'is-invalid'"
-                                      placeholder="Nom du contact, éléments de l'annonce, ce qui vous plaît dans l'entreprise…"></textarea>
-                            <div class="invalid-feedback" th:errors="*{notes}"></div>
-                        </div>
+            <section class="card stack">
+                <h2 class="hand-m verb-trouver">L'entreprise</h2>
+                <div class="form-grid">
+                    <div class="field">
+                        <label for="entreprise">Entreprise *</label>
+                        <input type="text" th:field="*{entreprise}" class="input" th:errorclass="is-invalid" required>
+                        <span class="error" th:if="${#fields.hasErrors('entreprise')}" th:errors="*{entreprise}"></span>
                     </div>
-
-                    <div class="d-flex gap-2 mt-4">
-                        <button type="submit" class="btn btn-primary"><i class="bi bi-check-lg"></i> Enregistrer</button>
-                        <a th:href="${candidature.id == null} ? @{/candidatures} : @{/candidatures/{id}(id=${candidature.id})}"
-                           class="btn btn-outline-secondary">Annuler</a>
+                    <div class="field">
+                        <label for="poste">Poste visé</label>
+                        <input type="text" th:field="*{poste}" class="input" th:errorclass="is-invalid">
+                        <span class="error" th:if="${#fields.hasErrors('poste')}" th:errors="*{poste}"></span>
+                    </div>
+                    <div class="field full">
+                        <label for="offreUrl">Lien de l'offre (si elle existe)</label>
+                        <input type="url" th:field="*{offreUrl}" class="input" th:errorclass="is-invalid" placeholder="https://">
+                        <span class="error" th:if="${#fields.hasErrors('offreUrl')}" th:errors="*{offreUrl}"></span>
+                    </div>
+                    <div class="field full">
+                        <label for="siteWeb">Site de l'entreprise</label>
+                        <input type="url" th:field="*{siteWeb}" class="input" th:errorclass="is-invalid" placeholder="https://">
+                        <span class="error" th:if="${#fields.hasErrors('siteWeb')}" th:errors="*{siteWeb}"></span>
+                    </div>
+                    <div class="field">
+                        <label for="ville">Ville</label>
+                        <input type="text" th:field="*{ville}" class="input" th:errorclass="is-invalid">
+                        <span class="error" th:if="${#fields.hasErrors('ville')}" th:errors="*{ville}"></span>
+                    </div>
+                    <div class="field">
+                        <label for="codePostal">Code postal</label>
+                        <input type="text" th:field="*{codePostal}" class="input" th:errorclass="is-invalid" inputmode="numeric">
+                        <span class="error" th:if="${#fields.hasErrors('codePostal')}" th:errors="*{codePostal}"></span>
                     </div>
                 </div>
-            </form>
-        </div>
+            </section>
+
+            <section class="card stack">
+                <h2 class="hand-m verb-relancer">Le suivi</h2>
+                <div class="form-grid">
+                    <div class="field">
+                        <label for="statut">Statut</label>
+                        <select th:field="*{statut}" class="select" th:errorclass="is-invalid">
+                            <option th:each="s : ${statuts}" th:value="${s}" th:text="${s.libelle}">Statut</option>
+                        </select>
+                        <span class="error" th:if="${#fields.hasErrors('statut')}" th:errors="*{statut}"></span>
+                    </div>
+                    <div class="field">
+                        <label for="dateEnvoi">Date d'envoi</label>
+                        <input type="date" th:field="*{dateEnvoi}" class="input">
+                    </div>
+                    <div class="field">
+                        <label for="dateRelance">Date de relance</label>
+                        <input type="date" th:field="*{dateRelance}" class="input">
+                        <span class="help">Calculée automatiquement si vous la laissez vide.</span>
+                    </div>
+                    <div class="field full">
+                        <label for="notes">Notes</label>
+                        <textarea th:field="*{notes}" class="textarea" th:errorclass="is-invalid"
+                                  placeholder="Nom du contact, éléments de l'annonce, ce qui vous plaît dans l'entreprise…"></textarea>
+                        <span class="error" th:if="${#fields.hasErrors('notes')}" th:errors="*{notes}"></span>
+                    </div>
+                </div>
+            </section>
+
+            <button type="submit" class="btn btn-primary btn-lg btn-block">Enregistrer</button>
+        </form>
     </div>
 </main>
 
-<footer th:replace="~{fragments/layout :: footer}"></footer>
-<th:block th:replace="~{fragments/layout :: scripts}"></th:block>
+<nav th:replace="~{fragments/layout :: tabbar('candidatures')}"></nav>
 </body>
 </html>

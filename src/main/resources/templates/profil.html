@@ -2,111 +2,91 @@
 <html lang="fr" xmlns:th="http://www.thymeleaf.org">
 <head th:replace="~{fragments/layout :: head('Mon profil')}"></head>
 
-<body class="bg-light">
+<body>
+<svg th:replace="~{fragments/layout :: icons}"></svg>
+<header th:replace="~{fragments/layout :: header('profil')}"></header>
 
-<nav th:replace="~{fragments/layout :: navbar}"></nav>
+<main class="container page">
+    <div class="narrow stack">
+        <th:block th:replace="~{fragments/layout :: flash}"></th:block>
 
-<main class="container py-4">
-    <div class="row justify-content-center">
-        <div class="col-lg-8">
+        <h1 class="title">Mon profil</h1>
 
-            <div th:replace="~{fragments/layout :: flash}"></div>
+        <section class="card-night stack-sm" aria-label="Avancement du profil">
+            <div class="row-between small" style="font-weight: 700">
+                <span>Profil complété</span>
+                <strong th:text="${completion} + ' %'">60 %</strong>
+            </div>
+            <div class="progress" aria-hidden="true"><span th:style="'width: ' + ${completion} + '%'"></span></div>
+            <p class="hand-m" style="font-size: 24px"
+               th:text="${completion >= 100} ? 'Parfait, l\'IA a tout ce qu\'il lui faut !' : 'Plus il est complet, plus vos lettres sont justes.'">
+                Plus il est complet, plus vos lettres sont justes.</p>
+        </section>
 
-            <h1 class="h3 mb-1">Mon profil</h1>
-            <p class="text-secondary mb-4">
-                Ces informations adaptent Candidus à votre recherche. Elles servent à trouver des entreprises
-                et à préparer vos lettres. Vous pouvez les compléter petit à petit.
-            </p>
+        <form th:action="@{/profil}" th:object="${profil}" method="post" novalidate class="stack">
 
-            <form th:action="@{/profil}" th:object="${profil}" method="post" novalidate>
+            <section class="card stack">
+                <h2 class="hand-m verb-trouver">Ce que je cherche</h2>
+                <div class="field">
+                    <label for="metierVise">Métier visé</label>
+                    <input type="text" th:field="*{metierVise}" class="input" th:errorclass="is-invalid"
+                           placeholder="Ex : formateur pour adultes, aide-soignant, comptable">
+                    <span class="error" th:if="${#fields.hasErrors('metierVise')}" th:errors="*{metierVise}"></span>
+                </div>
+                <div class="field">
+                    <label for="motsCles">Type d'entreprises à chercher</label>
+                    <input type="text" th:field="*{motsCles}" class="input" th:errorclass="is-invalid"
+                           placeholder="Ex : organisme de formation, maison de retraite">
+                    <span class="help">Ces mots servent à chercher les entreprises dans l'annuaire officiel.</span>
+                    <span class="error" th:if="${#fields.hasErrors('motsCles')}" th:errors="*{motsCles}"></span>
+                </div>
+                <div class="field">
+                    <label for="departements">Départements</label>
+                    <input type="text" th:field="*{departements}" class="input" th:errorclass="is-invalid" placeholder="Ex : 78, 92">
+                    <span class="help">Numéros séparés par des virgules.</span>
+                    <span class="error" th:if="${#fields.hasErrors('departements')}" th:errors="*{departements}"></span>
+                </div>
+            </section>
 
-                <div class="card border-0 shadow-sm mb-4">
-                    <div class="card-body p-4">
-                        <h2 class="h5 mb-3">Ce que je cherche</h2>
+            <section class="card stack">
+                <h2 class="hand-m verb-ecrire">Mon parcours</h2>
+                <div class="field">
+                    <label for="cvResume">Résumé de mon CV</label>
+                    <textarea th:field="*{cvResume}" class="textarea" rows="6" th:errorclass="is-invalid"
+                              placeholder="Vos expériences, diplômes et formations, en quelques lignes."></textarea>
+                    <span class="error" th:if="${#fields.hasErrors('cvResume')}" th:errors="*{cvResume}"></span>
+                </div>
+                <div class="field">
+                    <label for="pointsForts">Mes points forts</label>
+                    <textarea th:field="*{pointsForts}" class="textarea" rows="3" th:errorclass="is-invalid"
+                              placeholder="Ex : patient, bilingue français-arabe, permis B"></textarea>
+                    <span class="error" th:if="${#fields.hasErrors('pointsForts')}" th:errors="*{pointsForts}"></span>
+                </div>
+            </section>
 
-                        <div class="mb-3">
-                            <label for="metierVise" class="form-label">Métier visé</label>
-                            <input type="text" th:field="*{metierVise}" class="form-control"
-                                   th:classappend="${#fields.hasErrors('metierVise')} ? 'is-invalid'"
-                                   placeholder="Ex : formateur pour adultes, aide-soignant, comptable">
-                            <div class="invalid-feedback" th:errors="*{metierVise}"></div>
-                        </div>
-
-                        <div class="mb-3">
-                            <label for="motsCles" class="form-label">Type d'entreprises à chercher</label>
-                            <input type="text" th:field="*{motsCles}" class="form-control"
-                                   th:classappend="${#fields.hasErrors('motsCles')} ? 'is-invalid'"
-                                   placeholder="Ex : organisme de formation, maison de retraite, cabinet comptable">
-                            <div class="form-text">Ces mots servent à chercher les entreprises dans l'annuaire officiel.</div>
-                            <div class="invalid-feedback" th:errors="*{motsCles}"></div>
-                        </div>
-
-                        <div class="mb-1">
-                            <label for="departements" class="form-label">Départements</label>
-                            <input type="text" th:field="*{departements}" class="form-control"
-                                   th:classappend="${#fields.hasErrors('departements')} ? 'is-invalid'"
-                                   placeholder="Ex : 78, 92" inputmode="text">
-                            <div class="form-text">Numéros séparés par des virgules.</div>
-                            <div class="invalid-feedback" th:errors="*{departements}"></div>
-                        </div>
+            <section class="card stack">
+                <h2 class="hand-m verb-relancer">Ma signature</h2>
+                <p class="small muted" style="margin: 0">Ajoutés sous vos lettres, après votre prénom et votre nom.</p>
+                <div class="form-grid">
+                    <div class="field">
+                        <label for="telephone">Téléphone</label>
+                        <input type="tel" th:field="*{telephone}" class="input" th:errorclass="is-invalid" autocomplete="tel">
+                        <span class="error" th:if="${#fields.hasErrors('telephone')}" th:errors="*{telephone}"></span>
+                    </div>
+                    <div class="field">
+                        <label for="lienProfil">Lien LinkedIn ou portfolio</label>
+                        <input type="url" th:field="*{lienProfil}" class="input" th:errorclass="is-invalid" placeholder="https://">
+                        <span class="error" th:if="${#fields.hasErrors('lienProfil')}" th:errors="*{lienProfil}"></span>
                     </div>
                 </div>
+            </section>
 
-                <div class="card border-0 shadow-sm mb-4">
-                    <div class="card-body p-4">
-                        <h2 class="h5 mb-3">Mon parcours</h2>
-
-                        <div class="mb-3">
-                            <label for="cvResume" class="form-label">Résumé de mon CV</label>
-                            <textarea th:field="*{cvResume}" class="form-control" rows="6"
-                                      th:classappend="${#fields.hasErrors('cvResume')} ? 'is-invalid'"
-                                      placeholder="Vos expériences, diplômes et formations, en quelques lignes."></textarea>
-                            <div class="invalid-feedback" th:errors="*{cvResume}"></div>
-                        </div>
-
-                        <div class="mb-1">
-                            <label for="pointsForts" class="form-label">Mes points forts</label>
-                            <textarea th:field="*{pointsForts}" class="form-control" rows="3"
-                                      th:classappend="${#fields.hasErrors('pointsForts')} ? 'is-invalid'"
-                                      placeholder="Ex : patient, bilingue français-arabe, permis B"></textarea>
-                            <div class="invalid-feedback" th:errors="*{pointsForts}"></div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="card border-0 shadow-sm mb-4">
-                    <div class="card-body p-4">
-                        <h2 class="h5 mb-3">Ma signature</h2>
-                        <p class="text-secondary small">Ajoutés sous vos lettres, après votre prénom et votre nom.</p>
-
-                        <div class="row g-3">
-                            <div class="col-sm-5">
-                                <label for="telephone" class="form-label">Téléphone</label>
-                                <input type="tel" th:field="*{telephone}" class="form-control"
-                                       th:classappend="${#fields.hasErrors('telephone')} ? 'is-invalid'"
-                                       autocomplete="tel">
-                                <div class="invalid-feedback" th:errors="*{telephone}"></div>
-                            </div>
-                            <div class="col-sm-7">
-                                <label for="lienProfil" class="form-label">Lien LinkedIn ou portfolio</label>
-                                <input type="url" th:field="*{lienProfil}" class="form-control"
-                                       th:classappend="${#fields.hasErrors('lienProfil')} ? 'is-invalid'"
-                                       placeholder="https://">
-                                <div class="invalid-feedback" th:errors="*{lienProfil}"></div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <button type="submit" class="btn btn-primary btn-lg w-100">
-                    <i class="bi bi-check-lg"></i> Enregistrer mon profil
-                </button>
-            </form>
-        </div>
+            <button type="submit" class="btn btn-primary btn-lg btn-block">Enregistrer mon profil</button>
+        </form>
     </div>
 </main>
 
 <footer th:replace="~{fragments/layout :: footer}"></footer>
-<th:block th:replace="~{fragments/layout :: scripts}"></th:block>
+<nav th:replace="~{fragments/layout :: tabbar('profil')}"></nav>
 </body>
 </html>

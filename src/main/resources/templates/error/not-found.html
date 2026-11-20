@@ -2,24 +2,16 @@
 <html lang="fr" xmlns:th="http://www.thymeleaf.org">
 <head th:replace="~{fragments/layout :: head('Introuvable')}"></head>
 
-<body class="bg-light">
+<body>
+<svg th:replace="~{fragments/layout :: icons}"></svg>
 
-<nav th:replace="~{fragments/layout :: navbar}"></nav>
-
-<main class="container py-5">
-    <div class="row justify-content-center">
-        <div class="col-lg-6">
-            <div class="card border-0 shadow-sm">
-                <div class="card-body p-5 text-center">
-                    <i class="bi bi-search display-4 text-secondary"></i>
-                    <h1 class="h3 mt-3">Oups !</h1>
-                    <p class="text-secondary" th:text="${errorMessage}">Élément introuvable.</p>
-                    <a th:href="@{/candidatures}" class="btn btn-primary">Retour à mes candidatures</a>
-                </div>
-            </div>
-        </div>
+<main class="auth">
+    <div class="auth-box" style="text-align: center; align-items: center">
+        <p class="hand-xl">Oups !</p>
+        <h1 class="title">Introuvable</h1>
+        <p class="muted" style="margin: 0" th:text="${errorMessage}">Élément introuvable.</p>
+        <a th:href="@{/candidatures}" class="btn btn-primary">Retour à mes candidatures</a>
     </div>
 </main>
-
 </body>
 </html>

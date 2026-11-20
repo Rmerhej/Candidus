@@ -4,76 +4,127 @@
 <!-- En-tête commun : th:replace="~{fragments/layout :: head('Titre')}" -->
 <head th:fragment="head(title)">
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="theme-color" content="#1d4ed8">
-    <title th:text="${title} + ' - Candidus'">Candidus</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
-          rel="stylesheet">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css"
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+    <meta name="theme-color" content="#FFFFFF" media="(prefers-color-scheme: light)">
+    <meta name="theme-color" content="#0B1220" media="(prefers-color-scheme: dark)">
+    <title th:text="${title} + ' · Candidus'">Candidus</title>
+    <!-- Appliquer le thème choisi AVANT l'affichage, pour éviter un flash blanc en mode sombre -->
+    <script>
+        try {
+            var theme = localStorage.getItem("candidus-theme");
+            if (theme === "dark" || theme === "light") {
+                document.documentElement.setAttribute("data-theme", theme);
+            }
+        } catch (e) { /* stockage indisponible : on suit le réglage de l'appareil */ }
+    </script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@700&family=Nunito:wght@400;600;700;800;900&display=swap"
           rel="stylesheet">
     <link th:href="@{/css/candidus.css}" rel="stylesheet">
+    <script th:src="@{/js/app.js}" defer></script>
 </head>
 
 <body>
 
-<!-- Barre de navigation des pages connectées : th:replace="~{fragments/layout :: navbar}" -->
-<nav th:fragment="navbar" class="navbar navbar-expand-md navbar-dark bg-primary">
+<!-- Icônes au trait, utilisées avec <svg class="icon"><use href="#i-nom"></use></svg> -->
+<svg th:fragment="icons" xmlns="http://www.w3.org/2000/svg" style="display: none" aria-hidden="true">
+    <symbol id="i-home" viewBox="0 0 24 24"><path d="M4 11l8-7 8 7v9h-5v-6H9v6H4z"/></symbol>
+    <symbol id="i-list" viewBox="0 0 24 24"><path d="M5 6h14M5 12h14M5 18h9"/></symbol>
+    <symbol id="i-building" viewBox="0 0 24 24"><path d="M4 20V8l8-4 8 4v12M9 20v-5h6v5"/></symbol>
+    <symbol id="i-user" viewBox="0 0 24 24"><path d="M12 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8zM4 21c1-4 4-6 8-6s7 2 8 6"/></symbol>
+    <symbol id="i-sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></symbol>
+    <symbol id="i-moon" viewBox="0 0 24 24"><path d="M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5z"/></symbol>
+    <symbol id="i-logout" viewBox="0 0 24 24"><path d="M15 4h4v16h-4M10 8l-4 4 4 4M6 12h10"/></symbol>
+    <symbol id="i-plus" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></symbol>
+    <symbol id="i-check" viewBox="0 0 24 24"><path d="M5 12l5 5 9-10"/></symbol>
+    <symbol id="i-pin" viewBox="0 0 24 24"><path d="M12 21s-7-6.2-7-11a7 7 0 0 1 14 0c0 4.8-7 11-7 11z"/><circle cx="12" cy="10" r="2.5"/></symbol>
+    <symbol id="i-pen" viewBox="0 0 24 24"><path d="M4 20l4-1 11-11-3-3L5 16l-1 4z"/></symbol>
+    <symbol id="i-bell" viewBox="0 0 24 24"><path d="M6 17V11a6 6 0 0 1 12 0v6l2 2H4l2-2zM10 21h4"/></symbol>
+    <symbol id="i-back" viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7"/></symbol>
+    <symbol id="i-copy" viewBox="0 0 24 24"><path d="M8 8h11v11H8zM5 16V5h11"/></symbol>
+    <symbol id="i-trash" viewBox="0 0 24 24"><path d="M5 7h14M10 7V4h4v3M7 7l1 13h8l1-13"/></symbol>
+    <symbol id="i-search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="6"/><path d="M20 20l-4.5-4.5"/></symbol>
+    <symbol id="i-stars" viewBox="0 0 24 24"><path d="M12 3l1.8 4.7L18 9.5l-4.2 1.8L12 16l-1.8-4.7L6 9.5l4.2-1.8zM19 15l.8 2 2 .8-2 .8-.8 2-.8-2-2-.8 2-.8z"/></symbol>
+    <symbol id="i-info" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 11v6M12 7.5v.5"/></symbol>
+    <symbol id="i-alert" viewBox="0 0 24 24"><path d="M12 3l9.5 17h-19zM12 10v4M12 17v.5"/></symbol>
+</svg>
+
+<!-- Logo : th:replace="~{fragments/layout :: logo(@{/})}" -->
+<a th:fragment="logo(target)" th:href="${target}" class="logo" aria-label="Candidus, accueil">
+    <span class="logo-ring" aria-hidden="true"></span>
+    <span class="logo-text">Candidus</span>
+</a>
+
+<!-- Bouton de thème clair / sombre -->
+<button th:fragment="themeToggle" type="button" class="btn btn-secondary btn-icon theme-toggle" data-theme-toggle
+        aria-label="Changer de thème">
+    <svg class="icon sun" aria-hidden="true"><use href="#i-sun"></use></svg>
+    <svg class="icon moon" aria-hidden="true"><use href="#i-moon"></use></svg>
+</button>
+
+<!-- En-tête des pages connectées : th:replace="~{fragments/layout :: header('candidatures')}" -->
+<header th:fragment="header(active)" class="site-header">
     <div class="container">
-        <a class="navbar-brand fw-bold" th:href="@{/tableau-de-bord}">
-            <i class="bi bi-briefcase"></i> Candidus
+        <a th:href="@{/tableau-de-bord}" class="logo" aria-label="Candidus, tableau de bord">
+            <span class="logo-ring" aria-hidden="true"></span>
+            <span class="logo-text">Candidus</span>
         </a>
-        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#menu"
-                aria-controls="menu" aria-expanded="false" aria-label="Ouvrir le menu">
-            <span class="navbar-toggler-icon"></span>
-        </button>
-        <div class="collapse navbar-collapse" id="menu">
-            <ul class="navbar-nav ms-auto align-items-md-center gap-md-2">
-                <li class="nav-item">
-                    <a class="nav-link" th:href="@{/tableau-de-bord}"><i class="bi bi-house"></i> Accueil</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" th:href="@{/candidatures}"><i class="bi bi-list-check"></i> Mes candidatures</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" th:href="@{/entreprises}"><i class="bi bi-building"></i> Trouver des entreprises</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" th:href="@{/profil}"><i class="bi bi-person"></i> Mon profil</a>
-                </li>
-                <li class="nav-item">
-                    <!-- Déconnexion en POST (avec jeton CSRF) : un simple lien ne suffit pas -->
-                    <form th:action="@{/logout}" method="post" class="d-inline">
-                        <button type="submit" class="btn btn-sm btn-outline-light" title="Se déconnecter">
-                            <i class="bi bi-box-arrow-right"></i> <span class="d-md-none">Se déconnecter</span>
-                        </button>
-                    </form>
-                </li>
-            </ul>
+        <nav class="top-nav" aria-label="Navigation principale">
+            <a th:href="@{/tableau-de-bord}" th:aria-current="${active == 'accueil'} ? 'page'">Accueil</a>
+            <a th:href="@{/candidatures}" th:aria-current="${active == 'candidatures'} ? 'page'">Mes candidatures</a>
+            <a th:href="@{/entreprises}" th:aria-current="${active == 'entreprises'} ? 'page'">Trouver des entreprises</a>
+            <a th:href="@{/profil}" th:aria-current="${active == 'profil'} ? 'page'">Mon profil</a>
+        </nav>
+        <div class="header-actions">
+            <button type="button" class="btn btn-secondary btn-icon theme-toggle" data-theme-toggle
+                    aria-label="Changer de thème">
+                <svg class="icon sun" aria-hidden="true"><use href="#i-sun"></use></svg>
+                <svg class="icon moon" aria-hidden="true"><use href="#i-moon"></use></svg>
+            </button>
+            <!-- Déconnexion en POST (avec jeton CSRF) : un simple lien ne suffit pas -->
+            <form th:action="@{/logout}" method="post">
+                <button type="submit" class="btn btn-secondary btn-icon" aria-label="Se déconnecter" title="Se déconnecter">
+                    <svg class="icon" aria-hidden="true"><use href="#i-logout"></use></svg>
+                </button>
+            </form>
         </div>
     </div>
+</header>
+
+<!-- Barre d'onglets du téléphone : th:replace="~{fragments/layout :: tabbar('candidatures')}" -->
+<nav th:fragment="tabbar(active)" class="tab-bar" aria-label="Navigation principale">
+    <a th:href="@{/tableau-de-bord}" th:aria-current="${active == 'accueil'} ? 'page'">
+        <svg class="icon" aria-hidden="true"><use href="#i-home"></use></svg>Accueil
+    </a>
+    <a th:href="@{/candidatures}" th:aria-current="${active == 'candidatures'} ? 'page'">
+        <svg class="icon" aria-hidden="true"><use href="#i-list"></use></svg>Candidatures
+    </a>
+    <a th:href="@{/entreprises}" th:aria-current="${active == 'entreprises'} ? 'page'">
+        <svg class="icon" aria-hidden="true"><use href="#i-building"></use></svg>Entreprises
+    </a>
+    <a th:href="@{/profil}" th:aria-current="${active == 'profil'} ? 'page'">
+        <svg class="icon" aria-hidden="true"><use href="#i-user"></use></svg>Profil
+    </a>
 </nav>
 
 <!-- Messages de succès et d'erreur : th:replace="~{fragments/layout :: flash}" -->
 <th:block th:fragment="flash">
-    <div th:if="${successMessage}" class="alert alert-success alert-dismissible fade show" role="alert">
+    <div th:if="${successMessage}" class="flash flash-success" role="status">
+        <svg class="icon" aria-hidden="true"><use href="#i-check"></use></svg>
         <span th:text="${successMessage}"></span>
-        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Fermer"></button>
     </div>
-    <div th:if="${errorMessage}" class="alert alert-danger alert-dismissible fade show" role="alert">
+    <div th:if="${errorMessage}" class="flash flash-error" role="alert">
+        <svg class="icon" aria-hidden="true"><use href="#i-alert"></use></svg>
         <span th:text="${errorMessage}"></span>
-        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Fermer"></button>
     </div>
 </th:block>
 
 <!-- Pied de page commun -->
-<footer th:fragment="footer" class="text-center text-secondary small py-4">
-    Candidus – l'assistant emploi français. Rien n'est envoyé sans votre accord.
+<footer th:fragment="footer" class="site-footer">
+    <span class="hand" style="font-size: 22px">candidus</span> : blanc éclatant, sincère.
+    Rien n'est envoyé sans votre accord.
 </footer>
-
-<!-- Scripts communs : th:replace="~{fragments/layout :: scripts}" -->
-<th:block th:fragment="scripts">
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" defer></script>
-</th:block>
 
 </body>
 </html>

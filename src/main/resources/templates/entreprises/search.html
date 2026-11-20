@@ -2,98 +2,92 @@
 <html lang="fr" xmlns:th="http://www.thymeleaf.org">
 <head th:replace="~{fragments/layout :: head('Trouver des entreprises')}"></head>
 
-<body class="bg-light">
+<body>
+<svg th:replace="~{fragments/layout :: icons}"></svg>
+<header th:replace="~{fragments/layout :: header('entreprises')}"></header>
 
-<nav th:replace="~{fragments/layout :: navbar}"></nav>
+<main class="container page">
+    <th:block th:replace="~{fragments/layout :: flash}"></th:block>
 
-<main class="container py-4">
-
-    <div th:replace="~{fragments/layout :: flash}"></div>
-
-    <h1 class="h3 mb-1">Trouver des entreprises</h1>
-    <p class="text-secondary">
-        Des employeurs près de chez vous, même sans offre publiée : idéal pour les candidatures spontanées.
-        Source : l'Annuaire officiel des entreprises.
-    </p>
+    <div>
+        <p class="hand-xl">Près de chez vous</p>
+        <h1 class="title">Trouver des entreprises</h1>
+        <p class="muted" style="margin: 8px 0 0">
+            Des employeurs, même sans offre publiée : idéal pour les candidatures spontanées.
+            Source : l'Annuaire officiel des entreprises.
+        </p>
+    </div>
 
     <!-- Profil incomplet -->
-    <div th:unless="${profil.pretPourRecherche}" class="card border-0 shadow-sm">
-        <div class="card-body p-4 text-center">
-            <i class="bi bi-person-gear display-5 text-primary"></i>
-            <p class="mt-3">Indiquez d'abord dans votre profil le <strong>type d'entreprises</strong> à chercher
-                et vos <strong>départements</strong>.</p>
-            <a th:href="@{/profil}" class="btn btn-primary">Compléter mon profil</a>
-        </div>
+    <div th:unless="${profil.pretPourRecherche}" class="card-chalk stack" style="align-items: center; text-align: center; padding: 36px 20px">
+        <p class="hand-m verb-trouver">Une petite info d'abord</p>
+        <p class="muted" style="margin: 0">Indiquez dans votre profil le <strong>type d'entreprises</strong> à chercher
+            et vos <strong>départements</strong>.</p>
+        <a th:href="@{/profil}" class="btn btn-primary">Compléter mon profil</a>
     </div>
 
     <th:block th:if="${profil.pretPourRecherche}">
-        <div class="alert alert-light border small">
-            Recherche : <strong th:text="${profil.motsCles}">mots-clés</strong>
-            dans les départements <strong th:text="${profil.departements}">78,92</strong>.
+        <div class="card row-between small" style="padding: 14px 18px">
+            <span><strong th:text="${profil.motsCles}">mots-clés</strong> · <span th:text="${profil.departements}">78,92</span></span>
             <a th:href="@{/profil}">Modifier</a>
         </div>
 
-        <div th:if="${result != null and #lists.isEmpty(result.candidates())}" class="card border-0 shadow-sm">
-            <div class="card-body p-4 text-center text-secondary">
-                Aucune entreprise trouvée. Essayez d'autres mots dans votre profil (par exemple un secteur plus large).
-            </div>
+        <div th:if="${result != null and #lists.isEmpty(result.candidates())}" class="card-chalk muted" style="text-align: center">
+            Aucune entreprise trouvée. Essayez des mots plus larges dans votre profil (par exemple « formation » plutôt qu'un nom précis).
         </div>
 
         <form th:if="${result != null and !#lists.isEmpty(result.candidates())}"
-              th:action="@{/entreprises}" method="post">
+              th:action="@{/entreprises}" method="post" class="stack">
             <input type="hidden" name="page" th:value="${result.page()}">
 
-            <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-2">
-                <div class="small text-secondary">
+            <div class="row-between small">
+                <span class="muted" style="font-weight: 700">
                     <span th:text="${result.totalResults()}">0</span> entreprise(s) trouvée(s)
-                </div>
-                <div class="form-check">
-                    <input class="form-check-input" type="checkbox" id="select-all">
-                    <label class="form-check-label small" for="select-all">Tout cocher</label>
-                </div>
-            </div>
-
-            <div class="list-group shadow-sm mb-3">
-                <label th:each="c : ${result.candidates()}" class="list-group-item d-flex gap-3 py-3"
-                       th:classappend="${c.alreadyImported()} ? 'text-secondary'">
-                    <input class="form-check-input flex-shrink-0 mt-1 company-checkbox" type="checkbox"
-                           name="sirens" th:value="${c.siren()}" th:disabled="${c.alreadyImported()}">
-                    <span>
-                        <span class="fw-semibold d-block" th:text="${c.name()}">Entreprise</span>
-                        <span class="small d-block">
-                            <span th:text="${c.city()}">Ville</span>
-                            <span th:if="${c.postalCode()}" th:text="'(' + ${c.postalCode()} + ')'">(78400)</span>
-                            · <span th:text="${c.trancheLibelle()}">Effectif</span>
-                        </span>
-                        <span th:if="${c.alreadyImported()}" class="badge text-bg-light border mt-1">Déjà dans mes candidatures</span>
-                    </span>
+                </span>
+                <label class="check" style="align-items: center">
+                    <input type="checkbox" id="select-all">
+                    <span style="font-weight: 700">Tout cocher</span>
                 </label>
             </div>
 
-            <button type="submit" class="btn btn-primary w-100">
-                <i class="bi bi-plus-circle"></i> Ajouter les entreprises cochées à mes candidatures
-            </button>
-        </form>
-
-        <!-- Pagination -->
-        <nav th:if="${result != null and result.totalPages() > 1}" class="mt-3" aria-label="Pages">
-            <ul class="pagination justify-content-center">
-                <li class="page-item" th:classappend="${!result.hasPrevious()} ? 'disabled'">
-                    <a class="page-link" th:href="@{/entreprises(page=${result.page() - 1})}">Précédent</a>
-                </li>
-                <li class="page-item disabled">
-                    <span class="page-link" th:text="${result.page()} + ' / ' + ${result.totalPages()}">1 / 1</span>
-                </li>
-                <li class="page-item" th:classappend="${!result.hasNext()} ? 'disabled'">
-                    <a class="page-link" th:href="@{/entreprises(page=${result.page() + 1})}">Suivant</a>
+            <ul class="item-list">
+                <li th:each="c : ${result.candidates()}">
+                    <label class="pick" th:classappend="${c.alreadyImported()} ? 'is-done'">
+                        <input type="checkbox" class="company-checkbox" name="sirens" th:value="${c.siren()}"
+                               th:disabled="${c.alreadyImported()}">
+                        <span>
+                            <span class="item-title" th:text="${c.name()}">Entreprise</span>
+                            <span class="item-sub">
+                                <th:block th:text="${c.city()}">Ville</th:block><th:block
+                                    th:if="${c.postalCode()}" th:text="' (' + ${c.postalCode()} + ')'"> (78400)</th:block>
+                                · <th:block th:text="${c.trancheLibelle()}">Effectif</th:block>
+                            </span>
+                            <span th:if="${c.alreadyImported()}" class="small verb-relancer" style="font-weight: 800">Déjà dans mes candidatures</span>
+                        </span>
+                    </label>
                 </li>
             </ul>
+
+            <div class="sticky-action">
+                <button type="submit" class="btn btn-primary btn-lg btn-block">
+                    <svg class="icon" aria-hidden="true"><use href="#i-plus"></use></svg>
+                    <span data-count-label>Ajouter les entreprises cochées à mes candidatures</span>
+                </button>
+            </div>
+        </form>
+
+        <nav th:if="${result != null and result.totalPages() > 1}" class="pager" aria-label="Pages">
+            <a class="btn btn-secondary" th:classappend="${!result.hasPrevious()} ? 'disabled'"
+               th:href="@{/entreprises(page=${result.page() - 1})}">Précédent</a>
+            <span class="small muted" th:text="${result.page()} + ' / ' + ${result.totalPages()}">1 / 1</span>
+            <a class="btn btn-secondary" th:classappend="${!result.hasNext()} ? 'disabled'"
+               th:href="@{/entreprises(page=${result.page() + 1})}">Suivant</a>
         </nav>
     </th:block>
 </main>
 
 <footer th:replace="~{fragments/layout :: footer}"></footer>
-<th:block th:replace="~{fragments/layout :: scripts}"></th:block>
+<nav th:replace="~{fragments/layout :: tabbar('entreprises')}"></nav>
 <script th:src="@{/js/import.js}" defer></script>
 </body>
 </html>

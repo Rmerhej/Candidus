@@ -23,7 +23,9 @@ public class DashboardController {
     public String dashboard(@AuthenticationPrincipal CandidusUser user, Model model) {
         model.addAttribute("prenom", user.getPrenom());
         model.addAttribute("stats", dashboardService.compute(user.getId()));
-        model.addAttribute("profilPret", profilService.getOrCreate(user.getId()).isPretPourRecherche());
+        var profil = profilService.getOrCreate(user.getId());
+        model.addAttribute("profilPret", profil.isPretPourRecherche());
+        model.addAttribute("completion", profil.getCompletion());
         return "dashboard";
     }
 }

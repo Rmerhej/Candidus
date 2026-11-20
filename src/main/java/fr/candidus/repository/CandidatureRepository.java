@@ -28,6 +28,9 @@ public interface CandidatureRepository
     Set<String> findExistingSirens(@Param("utilisateurId") Long utilisateurId,
                                    @Param("sirens") Collection<String> sirens);
 
+    /** Candidatures envoyées depuis une date (ex : depuis lundi, pour l'objectif de la semaine). */
+    long countByUtilisateurIdAndDateEnvoiGreaterThanEqual(Long utilisateurId, LocalDate depuis);
+
     /** Une ligne [statut, nombre] par statut. */
     @Query("select c.statut, count(c) from Candidature c where c.utilisateur.id = :utilisateurId group by c.statut")
     List<Object[]> countByStatut(@Param("utilisateurId") Long utilisateurId);
