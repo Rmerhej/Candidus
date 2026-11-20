@@ -14,7 +14,10 @@
     </a>
 
     <div class="row-between" style="align-items: flex-start">
-        <div class="stack-sm">
+        <div class="row" style="flex-wrap: nowrap; align-items: flex-start">
+          <span class="avatar" th:classappend="'avatar-' + ${candidature.teinte}" aria-hidden="true"
+                style="width: 52px; height: 52px; font-size: 22px; border-radius: 16px" th:text="${candidature.initiale}">F</span>
+          <div class="stack-sm">
             <h1 class="title" th:text="${candidature.entreprise}">Entreprise</h1>
             <p class="muted" style="margin: 0">
                 <th:block th:if="${candidature.poste}" th:text="${candidature.poste} + ' · '">Poste · </th:block>
@@ -22,9 +25,14 @@
                 <th:block th:if="${candidature.codePostal}" th:text="' (' + ${candidature.codePostal} + ')'"> (78400)</th:block>
                 <th:block th:if="${candidature.trancheEffectif}" th:text="' · ' + ${trancheLibelle}"> · effectif</th:block>
             </p>
+          </div>
         </div>
-        <span class="badge" th:classappend="'badge-' + ${candidature.statut.couleur}"
-              th:text="${candidature.statut.libelle}">Statut</span>
+        <span class="item-side">
+            <span class="badge" th:classappend="'badge-' + ${candidature.statut.couleur}"
+                  th:text="${candidature.statut.libelle}">Statut</span>
+            <span th:if="${candidature.aiAdequation != null}" class="match"
+                  th:text="${candidature.aiAdequation} + ' % pour vous'">82 % pour vous</span>
+        </span>
     </div>
 
     <!-- Étapes -->

@@ -66,7 +66,7 @@
             <ul th:unless="${#lists.isEmpty(stats.relancesDues)}" class="item-list">
                 <li th:each="c : ${stats.relancesDues}" class="item todo">
                     <div class="row" style="flex-wrap: nowrap; min-width: 0">
-                        <span class="avatar" aria-hidden="true" th:text="${#strings.substring(c.entreprise, 0, 1)}">F</span>
+                        <span class="avatar" th:classappend="'avatar-' + ${c.teinte}" aria-hidden="true" th:text="${c.initiale}">F</span>
                         <div style="min-width: 0">
                             <a th:href="@{/candidatures/{id}(id=${c.id})}" class="item-title" style="color: var(--ink)"
                                th:text="${c.entreprise}">Entreprise</a>

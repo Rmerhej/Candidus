@@ -48,16 +48,22 @@
         <li th:each="c : ${candidatures.content}">
             <a th:href="@{/candidatures/{id}(id=${c.id})}" class="item"
                th:classappend="${c.statut.name() == 'A_ENVOYER'} ? 'todo'">
-                <span style="min-width: 0">
-                    <span class="item-title" th:text="${c.entreprise}">Entreprise</span>
-                    <span class="item-sub">
-                        <th:block th:if="${c.poste}" th:text="${c.poste}">Poste</th:block><th:block
-                            th:if="${c.poste != null and c.ville != null}"> · </th:block><th:block
-                            th:if="${c.ville}" th:text="${c.ville}">Ville</th:block>
+                <span class="item-main">
+                    <span class="avatar" th:classappend="'avatar-' + ${c.teinte}" aria-hidden="true" th:text="${c.initiale}">F</span>
+                    <span style="min-width: 0">
+                        <span class="item-title" th:text="${c.entreprise}">Entreprise</span>
+                        <span class="item-sub">
+                            <th:block th:if="${c.poste}" th:text="${c.poste}">Poste</th:block><th:block
+                                th:if="${c.poste != null and c.ville != null}"> · </th:block><th:block
+                                th:if="${c.ville}" th:text="${c.ville}">Ville</th:block>
+                        </span>
+                        <span th:if="${c.relanceDue}" class="item-alert">Relance à faire</span>
                     </span>
-                    <span th:if="${c.relanceDue}" class="item-alert">Relance à faire</span>
                 </span>
-                <span class="badge" th:classappend="'badge-' + ${c.statut.couleur}" th:text="${c.statut.libelle}">Statut</span>
+                <span class="item-side">
+                    <span class="badge" th:classappend="'badge-' + ${c.statut.couleur}" th:text="${c.statut.libelle}">Statut</span>
+                    <span th:if="${c.aiAdequation != null}" class="match" th:text="${c.aiAdequation} + ' % pour vous'">82 % pour vous</span>
+                </span>
             </a>
         </li>
     </ul>

@@ -16,17 +16,62 @@
 </header>
 
 <main class="container">
-    <section class="hero">
-        <p class="hand-xl">Chaque jour, un pas de plus.</p>
-        <h1 class="display">Votre candidature,<br><span class="highlight">en pleine lumière.</span></h1>
-        <p class="lead">
-            Les entreprises près de chez vous, des lettres préparées par l'IA, des relances au bon moment.
-            Et des encouragements, parce qu'on en a besoin. C'est vous qui envoyez.
-        </p>
-        <div class="row">
-            <a th:href="@{/inscription}" class="btn btn-primary btn-lg">Créer mon compte</a>
-            <span class="hand" style="font-size: 26px; color: var(--ink-muted)">c'est gratuit pour commencer</span>
+    <section class="hero hero-grid">
+        <div class="stack" style="gap: 20px">
+            <p class="hand-xl">Chaque jour, un pas de plus.</p>
+            <h1 class="display">Votre candidature,<br><span class="highlight">en pleine lumière.</span></h1>
+            <p class="lead">
+                Les entreprises près de chez vous, des lettres préparées par l'IA, des relances au bon moment.
+                Et des encouragements, parce qu'on en a besoin. C'est vous qui envoyez.
+            </p>
+            <div class="row">
+                <a th:href="@{/inscription}" class="btn btn-primary btn-lg">Créer mon compte</a>
+                <span class="hand" style="font-size: 26px; color: var(--ink-muted)">c'est gratuit pour commencer</span>
+            </div>
         </div>
+
+        <!-- Aperçu de l'application (illustration, données d'exemple) -->
+        <div class="phone-stage" role="img"
+             aria-label="Aperçu de Candidus : une lettre préparée par l'IA et des entreprises à relancer">
+            <div class="phone" aria-hidden="true">
+                <div class="phone-screen">
+                    <div class="row-between">
+                        <span class="logo-text" style="font-size: 24px">Candidus</span>
+                        <span class="match">3 / 5 cette semaine</span>
+                    </div>
+                    <div class="card-night stack-sm">
+                        <div class="row-between" style="align-items: baseline">
+                            <span class="hand" style="font-size: 22px; color: #FFFFFF">Préparée avec l'IA</span>
+                            <strong style="color: #FFFFFF">82 %</strong>
+                        </div>
+                        <span>Votre expérience de formateur correspond bien à cet organisme. Citez une de leurs formations.</span>
+                    </div>
+                    <span class="hand verb-relancer" style="font-size: 22px">À relancer</span>
+                    <div class="item todo">
+                        <div class="item-main">
+                            <span class="avatar avatar-1">F</span>
+                            <div><span class="item-title">Forma Plus</span><span class="item-sub">Il y a 7 jours</span></div>
+                        </div>
+                        <span class="badge badge-envoyee">Envoyée</span>
+                    </div>
+                    <div class="item">
+                        <div class="item-main">
+                            <span class="avatar avatar-2">A</span>
+                            <div><span class="item-title">Ateliers du Val</span><span class="item-sub">Nanterre</span></div>
+                        </div>
+                        <span class="badge badge-entretien">Entretien</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="story">
+        <p class="story-text" data-reveal>
+            <span class="hand">Candidus</span>, en latin, veut dire « blanc éclatant ».
+            À Rome, celui qui voulait être choisi blanchissait sa toge à la craie pour qu'on le remarque dans la foule.
+            C'est de là que vient le mot candidat. Aujourd'hui, la craie, c'est nous.
+        </p>
     </section>
 
     <section class="bento" aria-label="Ce que fait Candidus">

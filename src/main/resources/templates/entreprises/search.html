@@ -55,7 +55,8 @@
                     <label class="pick" th:classappend="${c.alreadyImported()} ? 'is-done'">
                         <input type="checkbox" class="company-checkbox" name="sirens" th:value="${c.siren()}"
                                th:disabled="${c.alreadyImported()}">
-                        <span>
+                        <span class="avatar" th:classappend="'avatar-' + ${c.teinte()}" aria-hidden="true" th:text="${c.initiale()}">F</span>
+                        <span style="min-width: 0">
                             <span class="item-title" th:text="${c.name()}">Entreprise</span>
                             <span class="item-sub">
                                 <th:block th:text="${c.city()}">Ville</th:block><th:block

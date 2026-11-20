@@ -15,4 +15,12 @@ public record CompanyCandidate(
         String trancheLibelle,
         boolean alreadyImported
 ) {
+
+    public String initiale() {
+        return fr.candidus.util.Avatar.initiale(name);
+    }
+
+    public int teinte() {
+        return fr.candidus.util.Avatar.teinte(name);
+    }
 }

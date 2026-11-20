@@ -107,6 +107,16 @@ public class Candidature {
                 && !dateRelance.isAfter(LocalDate.now());
     }
 
+    /** Initiale de l'entreprise, pour sa pastille dans les listes. */
+    public String getInitiale() {
+        return fr.candidus.util.Avatar.initiale(entreprise);
+    }
+
+    /** Teinte (0 à 3) de la pastille de l'entreprise. */
+    public int getTeinte() {
+        return fr.candidus.util.Avatar.teinte(entreprise);
+    }
+
     public Long getId() {
         return id;
     }

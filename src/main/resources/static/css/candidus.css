@@ -378,3 +378,66 @@ a.item:hover { border-color: var(--field-border); }
 @media (prefers-reduced-motion: no-preference) {
     .btn, .item, .chip, .pick { transition: background-color .15s, border-color .15s, filter .15s; }
 }
+
+/* ==========================================================================
+   Ajouts inspirés de Talentium et Behance
+   ========================================================================== */
+
+/* ----- Pastilles d'entreprise : 4 teintes, lisibles en clair comme en sombre ----- */
+.avatar-0 { background: var(--brand-tint); color: var(--ink); }
+.avatar-1 { background: var(--success-soft); color: var(--verb-relancer); }
+.avatar-2 { background: var(--ecrire-soft); color: var(--verb-ecrire); }
+.avatar-3 { background: var(--night); color: #FFFFFF; }
+.avatar { font-family: var(--font-sans); font-size: 18px; font-weight: 900; }
+.item .avatar { width: 44px; height: 44px; }
+.item-main { display: flex; align-items: center; gap: 12px; min-width: 0; }
+.item-side { display: flex; flex-direction: column; align-items: flex-end; gap: 6px; flex-shrink: 0; }
+
+:root { --ecrire-soft: #FDECE3; }
+:root[data-theme="dark"] { --ecrire-soft: #3A2418; }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) { --ecrire-soft: #3A2418; } }
+
+/* ----- Badge de correspondance « 82 % pour vous » ----- */
+.match {
+    display: inline-flex; align-items: center; gap: 4px; padding: 3px 9px; border-radius: var(--radius-pill);
+    font-size: 12px; font-weight: 900; background: var(--ink); color: var(--ground); white-space: nowrap;
+}
+
+/* ----- Accueil : texte + aperçu du téléphone ----- */
+.hero-grid { display: grid; gap: 40px; align-items: center; grid-template-columns: 1fr; }
+@media (min-width: 900px) { .hero-grid { grid-template-columns: minmax(0, 1.15fr) minmax(0, 0.85fr); } }
+
+.phone-stage {
+    display: flex; justify-content: center; padding: 28px 0;
+    background:
+        radial-gradient(circle at 30% 20%, var(--brand-tint) 0, transparent 55%),
+        radial-gradient(circle at 80% 85%, var(--success-soft) 0, transparent 50%);
+    border-radius: 36px;
+}
+.phone {
+    width: 290px; border-radius: 40px; padding: 12px; background: var(--ink);
+    box-shadow: 0 30px 60px rgba(11, 27, 63, .25);
+}
+.phone-screen {
+    border-radius: 30px; background: var(--ground); padding: 20px 14px; display: flex; flex-direction: column; gap: 12px;
+    font-size: 13px;
+}
+.phone-screen .card-night { padding: 14px; border-radius: 18px; }
+.phone-screen .item { padding: 10px 12px; border-radius: 14px; }
+.phone-screen .item .avatar { width: 34px; height: 34px; font-size: 15px; border-radius: 10px; }
+.phone-screen .item-title { font-size: 14px; }
+.phone-screen .item-sub { font-size: 12px; }
+
+@media (prefers-reduced-motion: no-preference) {
+    .phone { animation: flotte 6s ease-in-out infinite; }
+    @keyframes flotte { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-8px); } }
+}
+
+/* ----- Histoire qui se dévoile au défilement ----- */
+.story { padding: 64px 0; max-width: 900px; }
+.story-text { font-size: clamp(28px, 4.6vw, 48px); line-height: 1.2; font-weight: 800; letter-spacing: -0.02em; margin: 0; }
+.story-text .mot { transition: color .25s; }
+.story-text.est-anime .mot { color: var(--chalk-line); }
+.story-text.est-anime .mot.vu { color: var(--ink); }
+.story-text .hand { font-size: 1.15em; color: var(--brand); }
+.story-text.est-anime .hand .mot.vu { color: var(--brand); }
