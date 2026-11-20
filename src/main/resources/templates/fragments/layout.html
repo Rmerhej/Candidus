@@ -120,10 +120,42 @@
     </div>
 </th:block>
 
-<!-- Pied de page commun -->
+<!-- Pied de page commun : th:replace="~{fragments/layout :: footer}" -->
 <footer th:fragment="footer" class="site-footer">
-    <span class="hand" style="font-size: 22px">candidus</span> : blanc éclatant, sincère.
-    Rien n'est envoyé sans votre accord.
+    <div class="container">
+        <div class="footer-grid">
+            <div class="footer-brand">
+                <a th:href="@{/}" class="logo" aria-label="Candidus, accueil">
+                    <span class="logo-ring" aria-hidden="true"></span>
+                    <span class="logo-text">Candidus</span>
+                </a>
+                <p>L'assistant emploi français, simple et bienveillant.
+                    Vous relisez, vous envoyez : rien ne part sans votre accord.</p>
+            </div>
+            <nav class="footer-col" aria-label="Candidus">
+                <h2>Candidus</h2>
+                <a th:href="@{/#histoire}">Notre histoire</a>
+                <a th:href="@{/#fonctionnalites}">Fonctionnalités</a>
+                <a th:href="@{/inscription}">Créer un compte</a>
+            </nav>
+            <nav class="footer-col" aria-label="Aide">
+                <h2>Aide</h2>
+                <a th:href="@{/aide}">Questions fréquentes</a>
+                <a href="mailto:contact@candidus.app">Nous écrire</a>
+            </nav>
+            <nav class="footer-col" aria-label="Informations légales">
+                <h2>Légal</h2>
+                <a th:href="@{/mentions-legales}">Mentions légales</a>
+                <a th:href="@{/conditions}">Conditions d'utilisation</a>
+                <a th:href="@{/confidentialite}">Confidentialité</a>
+            </nav>
+        </div>
+        <div class="footer-bottom">
+            <span>© 2026 Candidus · Conçu en France</span>
+            <span><span class="hand" style="font-size: 22px; color: #FFFFFF">candidus</span> : blanc éclatant, sincère.</span>
+        </div>
+        <p class="footer-mark" aria-hidden="true">candidus</p>
+    </div>
 </footer>
 
 </body>

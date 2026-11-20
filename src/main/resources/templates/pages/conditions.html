@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Conditions d\'utilisation')}"></head>
+
+<body>
+<svg th:replace="~{fragments/layout :: icons}"></svg>
+
+<header class="site-header">
+    <div class="container">
+        <a th:replace="~{fragments/layout :: logo(@{/})}"></a>
+        <div class="header-actions">
+            <button th:replace="~{fragments/layout :: themeToggle}"></button>
+        </div>
+    </div>
+</header>
+
+<main class="container page">
+    <article class="narrow stack prose">
+        <p class="hand-xl">Les règles du jeu</p>
+        <h1 class="title">Conditions d'utilisation</h1>
+        <p class="card small" style="margin: 0"><strong>Page en cours de rédaction.</strong>
+            Les éléments entre crochets seront complétés avant l'ouverture du service au public.</p>
+
+        <h2 class="subtitle">Le service</h2>
+        <p>Candidus aide à organiser une recherche d'emploi : suivi des candidatures, recherche d'entreprises et
+            préparation de lettres avec une intelligence artificielle. Candidus n'envoie rien à votre place.</p>
+
+        <h2 class="subtitle">Votre compte</h2>
+        <p>Vous êtes responsable de la confidentialité de votre mot de passe et des informations que vous saisissez.</p>
+
+        <h2 class="subtitle">Les textes proposés par l'IA</h2>
+        <p>Les lettres proposées sont des brouillons. Relisez-les et corrigez-les avant tout envoi : vous restez
+            responsable de ce que vous envoyez.</p>
+
+        <h2 class="subtitle">Tarifs et résiliation</h2>
+        <p>[Offres, prix, durée d'engagement et modalités de résiliation à compléter avant l'ouverture des abonnements.]</p>
+
+    </article>
+</main>
+
+<footer th:replace="~{fragments/layout :: footer}"></footer>
+</body>
+</html>

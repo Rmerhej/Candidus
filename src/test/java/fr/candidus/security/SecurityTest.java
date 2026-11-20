@@ -39,6 +39,15 @@ class SecurityTest {
     }
 
     @Test
+    void lesPagesDInformationSontPubliquesEtOntLePiedDePage() throws Exception {
+        for (String url : new String[]{"/aide", "/mentions-legales", "/conditions", "/confidentialite"}) {
+            mockMvc.perform(get(url))
+                    .andExpect(status().isOk())
+                    .andExpect(content().string(containsString("Questions fréquentes")));
+        }
+    }
+
+    @Test
     void unePageProtegeeRedirigeVersLaConnexion() throws Exception {
         mockMvc.perform(get("/candidatures"))
                 .andExpect(status().is3xxRedirection())

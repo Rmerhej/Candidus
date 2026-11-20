@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Mentions légales')}"></head>
+
+<body>
+<svg th:replace="~{fragments/layout :: icons}"></svg>
+
+<header class="site-header">
+    <div class="container">
+        <a th:replace="~{fragments/layout :: logo(@{/})}"></a>
+        <div class="header-actions">
+            <button th:replace="~{fragments/layout :: themeToggle}"></button>
+        </div>
+    </div>
+</header>
+
+<main class="container page">
+    <article class="narrow stack prose">
+        <p class="hand-xl">Qui sommes-nous</p>
+        <h1 class="title">Mentions légales</h1>
+        <p class="card small" style="margin: 0"><strong>Page en cours de rédaction.</strong>
+            Les éléments entre crochets seront complétés avant l'ouverture du service au public.</p>
+
+        <h2 class="subtitle">Éditeur du site</h2>
+        <p>Roland Merhej, entrepreneur individuel [statut et numéro SIRET à compléter].<br>
+            Adresse : [à compléter]<br>
+            Contact : <a href="mailto:contact@candidus.app">contact@candidus.app</a></p>
+
+        <h2 class="subtitle">Directeur de la publication</h2>
+        <p>Roland Merhej.</p>
+
+        <h2 class="subtitle">Hébergement</h2>
+        <p>[Nom, adresse et téléphone de l'hébergeur à compléter.]</p>
+
+        <h2 class="subtitle">Données des entreprises</h2>
+        <p>Les informations sur les entreprises proviennent de l'API Recherche d'entreprises
+            (annuaire-entreprises.data.gouv.fr), sous Licence Ouverte.</p>
+
+    </article>
+</main>
+
+<footer th:replace="~{fragments/layout :: footer}"></footer>
+</body>
+</html>

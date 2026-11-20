@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Questions fréquentes')}"></head>
+
+<body>
+<svg th:replace="~{fragments/layout :: icons}"></svg>
+
+<header class="site-header">
+    <div class="container">
+        <a th:replace="~{fragments/layout :: logo(@{/})}"></a>
+        <div class="header-actions">
+            <button th:replace="~{fragments/layout :: themeToggle}"></button>
+        </div>
+    </div>
+</header>
+
+<main class="container page">
+    <article class="narrow stack prose">
+        <p class="hand-xl">On vous répond</p>
+        <h1 class="title">Questions fréquentes</h1>
+
+        <h2 class="subtitle">Candidus envoie-t-il mes candidatures à ma place ?</h2>
+        <p>Non, jamais. Candidus vous aide à trouver des entreprises et à préparer vos lettres. Vous relisez, vous
+            personnalisez, puis vous envoyez vous-même depuis votre messagerie.</p>
+
+        <h2 class="subtitle">D'où viennent les entreprises proposées ?</h2>
+        <p>De l'Annuaire officiel des entreprises (données publiques de l'État). Candidus cherche selon le type
+            d'entreprises et les départements indiqués dans votre profil, même quand aucune offre n'est publiée.</p>
+
+        <h2 class="subtitle">Comment l'IA prépare-t-elle ma lettre ?</h2>
+        <p>Elle lit votre profil (métier visé, parcours, points forts) et les informations publiques sur
+            l'entreprise, puis propose un brouillon. Elle n'invente pas d'expérience : plus votre profil est complet,
+            plus la lettre est juste.</p>
+
+        <h2 class="subtitle">Quand dois-je relancer un employeur ?</h2>
+        <p>Candidus vous le rappelle 7 jours après l'envoi. Une relance courte et polie montre votre motivation.</p>
+
+        <h2 class="subtitle">Comment passer en mode sombre ?</h2>
+        <p>Candidus suit le réglage de votre téléphone ou de votre ordinateur. Le bouton soleil/lune, en haut de
+            l'écran, permet de choisir vous-même.</p>
+
+        <h2 class="subtitle">Une autre question ?</h2>
+        <p>Écrivez-nous à <a href="mailto:contact@candidus.app">contact@candidus.app</a>.</p>
+
+    </article>
+</main>
+
+<footer th:replace="~{fragments/layout :: footer}"></footer>
+</body>
+</html>
