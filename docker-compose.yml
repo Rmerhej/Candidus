@@ -1,0 +1,49 @@
+services:
+
+  # ----- Base de données MySQL -----
+  candidus-db:
+    image: mysql:8.0
+    container_name: candidus-db
+    restart: unless-stopped
+    environment:
+      MYSQL_DATABASE: candidus
+      MYSQL_USER: candidus_app
+      MYSQL_PASSWORD: ${DB_PASSWORD}
+      MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD}
+    ports:
+      # 127.0.0.1 : MySQL accessible uniquement depuis votre PC, pas depuis le réseau
+      - "127.0.0.1:3309:3306"
+    volumes:
+      - candidus-mysql-data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD-SHELL", "mysqladmin ping -h localhost -p$${MYSQL_ROOT_PASSWORD}"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+  # ----- Application Spring Boot -----
+  app:
+    build: .
+    image: candidus:latest
+    container_name: candidus-app
+    # Pas de redémarrage automatique : l'application ne consomme de la mémoire que quand vous la lancez
+    restart: "no"
+    depends_on:
+      candidus-db:
+        # On attend que MySQL réponde vraiment (healthcheck), pas seulement que le conteneur existe
+        condition: service_healthy
+    # Mots de passe et clé Gemini lus dans .env (le fichier n'est jamais copié dans l'image)
+    env_file: .env
+    environment:
+      # Dans le réseau Docker, MySQL s'appelle "candidus-db" et écoute sur 3306 (pas 3309)
+      SPRING_DATASOURCE_URL: jdbc:mysql://candidus-db:3306/candidus?serverTimezone=UTC
+      SPRING_JPA_SHOW_SQL: "false"
+      # Heure française pour les dates affichées (ex : "Analysé le ... à 14:05")
+      TZ: Europe/Paris
+    ports:
+      - "127.0.0.1:8081:8080"
+    # Plafond mémoire : utile avec 8 Go de RAM
+    mem_limit: 768m
+
+volumes:
+  candidus-mysql-data:

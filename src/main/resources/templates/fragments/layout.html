@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org">
+
+<!-- En-tête commun : th:replace="~{fragments/layout :: head('Titre')}" -->
+<head th:fragment="head(title)">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title th:text="${title} + ' - Candidus'">Candidus</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+          rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css"
+          rel="stylesheet">
+</head>
+
+<body>
+
+<!-- Barre de navigation commune : th:replace="~{fragments/layout :: navbar}" -->
+<nav th:fragment="navbar" class="navbar navbar-expand-lg navbar-dark bg-primary">
+    <div class="container">
+        <a class="navbar-brand fw-bold" th:href="@{/}">
+            <i class="bi bi-briefcase"></i> Candidus
+        </a>
+        <div class="d-flex gap-3">
+            <a class="nav-link text-white" th:href="@{/prospects}">Mes prospects</a>
+            <a class="nav-link text-white" th:href="@{/import}">
+                <i class="bi bi-cloud-download"></i> Importer
+            </a>
+            <a class="nav-link text-white" th:href="@{/tableau-de-bord}">
+                <i class="bi bi-bar-chart"></i> Tableau de bord
+            </a>
+            <!-- Déconnexion en POST (avec jeton CSRF) : un simple lien ne suffit pas -->
+            <form th:action="@{/logout}" method="post" class="d-inline">
+                <button type="submit" class="btn btn-sm btn-outline-light" title="Se déconnecter">
+                    <i class="bi bi-box-arrow-right"></i>
+                </button>
+            </form>
+        </div>
+    </div>
+</nav>
+
+<!-- Message de succès commun : th:replace="~{fragments/layout :: flash}" -->
+<div th:fragment="flash"
+     th:if="${successMessage}"
+     class="alert alert-success alert-dismissible fade show"
+     role="alert">
+    <span th:text="${successMessage}"></span>
+    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Fermer"></button>
+</div>
+
+<!-- Scripts communs : th:replace="~{fragments/layout :: scripts}" -->
+<th:block th:fragment="scripts">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" defer></script>
+</th:block>
+
+</body>
+</html>

@@ -1,0 +1,66 @@
+spring:
+  application:
+    name: candidus
+
+  # Lit les variables du fichier .env (ignoré par Git) à la racine du projet
+  config:
+    import: optional:file:.env[.properties]
+
+  datasource:
+    url: jdbc:mysql://localhost:3309/candidus?serverTimezone=UTC
+    username: candidus_app
+    password: ${DB_PASSWORD}
+
+  # ----- Agent IA : Gemini via Spring AI -----
+  ai:
+    google:
+      genai:
+        # Avec une clé API, Spring AI utilise l'API Gemini "développeur" (pas Vertex AI)
+        api-key: ${candidus.ai.api-key}
+        chat:
+          model: ${GEMINI_MODEL:gemini-3.1-flash-lite}
+          # Faible "créativité" : des réponses plus factuelles et plus régulières
+          temperature: 0.3
+    retry:
+      # 10 tentatives par défaut : trop long si la clé est fausse ou si la limite est atteinte
+      max-attempts: 2
+
+  # ----- Migrations : c'est Flyway, et non plus Hibernate, qui crée et modifie les tables -----
+  jpa:
+    hibernate:
+      # none : Hibernate ne touche plus au schéma. Toute modification passe par un fichier
+      # db/migration/V2__..., V3__... (versionné, rejouable, relu en Pull Request)
+      ddl-auto: none
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+
+server:
+  port: 8080
+  servlet:
+    session:
+      persistent: false
+
+# API publique Recherche d'entreprises (gratuite, sans clé)
+candidus:
+  ai:
+    # Clé lue dans le fichier .env (GEMINI_API_KEY). Valeur par défaut : l'application démarre
+    # sans clé, et la fiche prospect affiche un message clair au lieu de planter.
+    api-key: ${GEMINI_API_KEY:a-configurer}
+
+  api:
+    recherche-entreprises:
+      base-url: https://recherche-entreprises.api.gouv.fr
+
+  # Connexion à l'application (lus dans .env)
+  security:
+    username: ${APP_USERNAME:roland}
+    password: ${APP_PASSWORD:}
+
+  # Signature ajoutée automatiquement à chaque brouillon d'e-mail
+  signature:
+    nom: Roland Merhej
+    titre: Développeur d'applications web (titre professionnel CDA)
+    ville: Chatou
+    lien: https://www.linkedin.com/in/rolandmerhej

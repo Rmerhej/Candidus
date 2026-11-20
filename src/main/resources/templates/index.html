@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Accueil')}"></head>
+
+<body class="bg-light">
+
+<nav th:replace="~{fragments/layout :: navbar}"></nav>
+
+<main class="container py-5">
+
+    <div class="row justify-content-center">
+        <div class="col-lg-9">
+
+            <div th:replace="~{fragments/layout :: flash}"></div>
+
+            <div class="card border-0 shadow-sm">
+                <div class="card-body p-5 text-center">
+
+                    <h1 class="display-5 fw-bold mb-3">
+                        Trouvez vos futurs clients
+                    </h1>
+
+                    <p class="lead text-secondary mb-4">
+                        Identifiez les organismes de formation et les PME à planning
+                        (restauration, nettoyage, aide à domicile) qui ont besoin
+                        d'une application de planning et de présences.
+                    </p>
+
+                    <a th:href="@{/prospects/nouveau}"
+                       class="btn btn-primary btn-lg">
+                        <i class="bi bi-plus-circle"></i>
+                        Ajouter un prospect
+                    </a>
+                    <a th:href="@{/import}"
+                       class="btn btn-success btn-lg ms-2">
+                        <i class="bi bi-cloud-download"></i>
+                        Importer des entreprises
+                    </a>
+                    <a th:href="@{/prospects}"
+                       class="btn btn-outline-primary btn-lg ms-2">
+                        <i class="bi bi-list-ul"></i>
+                        Voir les prospects
+                    </a>
+
+                    <p class="text-secondary small mt-3">
+                        Votre assistant intelligent de prospection.
+                    </p>
+
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+</main>
+
+<th:block th:replace="~{fragments/layout :: scripts}"></th:block>
+</body>
+</html>
