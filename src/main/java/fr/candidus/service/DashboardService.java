@@ -2,116 +2,72 @@ package fr.candidus.service;
 
 import fr.candidus.dto.DashboardStats;
 import fr.candidus.dto.DashboardStats.CountItem;
-import fr.candidus.enums.ProspectStatus;
-import fr.candidus.repository.ProspectRepository;
+import fr.candidus.enums.StatutCandidature;
+import fr.candidus.repository.CandidatureRepository;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
+import java.time.Clock;
+import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.EnumMap;
-import java.util.EnumSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 /**
- * Calcule les chiffres du tableau de bord à partir de quelques requêtes "group by".
+ * Calcule les chiffres du tableau de bord de l'utilisateur connecté.
  */
 @Service
 public class DashboardService {
 
-    /** Prospects à qui on a écrit (quelle que soit la suite). */
-    static final Set<ProspectStatus> CONTACTES = EnumSet.of(
-            ProspectStatus.CONTACTE, ProspectStatus.RELANCE, ProspectStatus.REPONDU,
-            ProspectStatus.CLIENT, ProspectStatus.PERDU);
+    private final CandidatureRepository candidatureRepository;
+    private final Clock clock;
 
-    /** Prospects qui ont répondu. */
-    static final Set<ProspectStatus> REPONSES = EnumSet.of(ProspectStatus.REPONDU, ProspectStatus.CLIENT);
-
-    private static final String NON_DEFINI = "Non défini";
-
-    private final ProspectRepository prospectRepository;
-
-    public DashboardService(ProspectRepository prospectRepository) {
-        this.prospectRepository = prospectRepository;
+    public DashboardService(CandidatureRepository candidatureRepository, Clock clock) {
+        this.candidatureRepository = candidatureRepository;
+        this.clock = clock;
     }
 
-    public DashboardStats compute() {
-        Map<ProspectStatus, Long> statusCounts = new EnumMap<>(ProspectStatus.class);
-        long sansStatut = 0;
-        for (Object[] row : prospectRepository.countByStatus()) {
-            long count = ((Number) row[1]).longValue();
-            if (row[0] instanceof ProspectStatus status) {
-                statusCounts.put(status, count);
-            } else {
-                sansStatut += count;
+    @Transactional(readOnly = true)
+    public DashboardStats compute(Long utilisateurId) {
+        Map<StatutCandidature, Long> counts = new EnumMap<>(StatutCandidature.class);
+        for (Object[] row : candidatureRepository.countByStatut(utilisateurId)) {
+            if (row[0] instanceof StatutCandidature statut) {
+                counts.put(statut, ((Number) row[1]).longValue());
             }
         }
 
-        long total = statusCounts.values().stream().mapToLong(Long::longValue).sum() + sansStatut;
-        long contactes = sum(statusCounts, CONTACTES);
-        long reponses = sum(statusCounts, REPONSES);
-        long clients = statusCounts.getOrDefault(ProspectStatus.CLIENT, 0L);
+        long total = counts.values().stream().mapToLong(Long::longValue).sum();
+        long envoyees = sum(counts, StatutCandidature.ENVOYEES);
+        long reponses = sum(counts, StatutCandidature.REPONSES);
+        long entretiens = counts.getOrDefault(StatutCandidature.ENTRETIEN, 0L)
+                + counts.getOrDefault(StatutCandidature.EMBAUCHE, 0L);
 
-        // Tous les statuts, dans l'ordre du suivi commercial, même ceux à 0
+        // Tous les statuts, dans l'ordre du suivi, même ceux à 0
         List<CountItem> parStatut = new ArrayList<>();
-        for (ProspectStatus status : ProspectStatus.values()) {
-            parStatut.add(item(status.getLibelle(), statusCounts.getOrDefault(status, 0L), total));
+        for (StatutCandidature statut : StatutCandidature.values()) {
+            long nombre = counts.getOrDefault(statut, 0L);
+            int pourcentage = total == 0 ? 0 : (int) Math.round(nombre * 100.0 / total);
+            parStatut.add(new CountItem(statut.getLibelle(), nombre, pourcentage, statut.getCouleur()));
         }
-        if (sansStatut > 0) {
-            parStatut.add(item(NON_DEFINI, sansStatut, total));
-        }
-
-        long prioritaires = 0;
-        List<CountItem> parQualification = new ArrayList<>();
-        for (Object[] row : prospectRepository.countByQualification()) {
-            long count = ((Number) row[1]).longValue();
-            if ("Prioritaire".equals(row[0])) {
-                prioritaires = count;
-            }
-            parQualification.add(item(label(row[0]), count, total));
-        }
-
-        List<CountItem> parSecteur = new ArrayList<>();
-        for (Object[] row : prospectRepository.countBySector()) {
-            parSecteur.add(item(label(row[0]), ((Number) row[1]).longValue(), total));
-        }
-
-        // Les plus nombreux en premier
-        Comparator<CountItem> parNombre = Comparator.comparingLong(CountItem::nombre).reversed();
-        parSecteur.sort(parNombre);
-        parQualification.sort(parNombre);
 
         return new DashboardStats(
                 total,
-                prospectRepository.countByAnalysedAtIsNotNull(),
-                prioritaires,
-                contactes,
+                envoyees,
                 reponses,
-                clients,
-                percentOrNull(reponses, contactes),
-                percentOrNull(clients, contactes),
+                entretiens,
+                percentOrNull(reponses, envoyees),
                 parStatut,
-                parSecteur,
-                parQualification);
+                candidatureRepository.findRelancesDues(
+                        utilisateurId, StatutCandidature.EN_ATTENTE, LocalDate.now(clock)));
     }
 
-    // ----- Outils -----
-
-    private static long sum(Map<ProspectStatus, Long> counts, Set<ProspectStatus> statuses) {
-        return statuses.stream().mapToLong(s -> counts.getOrDefault(s, 0L)).sum();
+    private static long sum(Map<StatutCandidature, Long> counts, Set<StatutCandidature> statuts) {
+        return statuts.stream().mapToLong(s -> counts.getOrDefault(s, 0L)).sum();
     }
 
-    private static CountItem item(String libelle, long nombre, long total) {
-        int percent = total == 0 ? 0 : (int) Math.round(nombre * 100.0 / total);
-        return new CountItem(libelle, nombre, percent);
-    }
-
-    private static String label(Object value) {
-        return value == null || value.toString().isBlank() ? NON_DEFINI : value.toString();
-    }
-
-    /** Pourcentage arrondi, ou null si le dénominateur est 0 (affiché "—" : un taux sur 0 n'a pas de sens). */
+    /** Pourcentage arrondi, ou null si le dénominateur est 0 (affiché "—"). */
     static Integer percentOrNull(long part, long whole) {
         return whole == 0 ? null : (int) Math.round(part * 100.0 / whole);
     }

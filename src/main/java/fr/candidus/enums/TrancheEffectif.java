@@ -7,7 +7,7 @@ import java.util.Map;
  */
 public final class TrancheEffectif {
 
-    /** Tranches visées : de 10 à 49 salariés. */
+    /** Tranches de 10 à 49 salariés. */
     public static final String CIBLES = "11,12";
 
     private static final Map<String, String> LIBELLES = Map.ofEntries(

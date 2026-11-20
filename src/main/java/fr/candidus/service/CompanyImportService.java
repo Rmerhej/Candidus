@@ -7,12 +7,12 @@ import fr.candidus.client.dto.ApiSearchResponse;
 import fr.candidus.dto.CompanyCandidate;
 import fr.candidus.dto.CompanySearchResult;
 import fr.candidus.dto.ImportReport;
-import fr.candidus.entity.Prospect;
-import fr.candidus.enums.Departement;
-import fr.candidus.enums.ProspectStatus;
-import fr.candidus.enums.TargetSegment;
+import fr.candidus.entity.Candidature;
+import fr.candidus.entity.Profil;
+import fr.candidus.enums.StatutCandidature;
 import fr.candidus.enums.TrancheEffectif;
-import fr.candidus.repository.ProspectRepository;
+import fr.candidus.repository.CandidatureRepository;
+import fr.candidus.repository.UtilisateurRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -24,7 +24,8 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 /**
- * Recherche d'entreprises dans l'API et import des entreprises choisies comme prospects.
+ * Recherche d'entreprises (selon le profil de l'utilisateur) et import des entreprises choisies
+ * comme candidatures spontanées "à envoyer".
  */
 @Service
 public class CompanyImportService {
@@ -32,25 +33,27 @@ public class CompanyImportService {
     private static final Pattern SIREN_PATTERN = Pattern.compile("^\\d{9}$");
 
     private final RechercheEntreprisesClient client;
-    private final ProspectRepository prospectRepository;
-    private final ProspectScoringService scoringService;
+    private final CandidatureRepository candidatureRepository;
+    private final UtilisateurRepository utilisateurRepository;
+    private final CandidatureScoringService scoringService;
 
     public CompanyImportService(RechercheEntreprisesClient client,
-                                ProspectRepository prospectRepository,
-                                ProspectScoringService scoringService) {
+                                CandidatureRepository candidatureRepository,
+                                UtilisateurRepository utilisateurRepository,
+                                CandidatureScoringService scoringService) {
         this.client = client;
-        this.prospectRepository = prospectRepository;
+        this.candidatureRepository = candidatureRepository;
+        this.utilisateurRepository = utilisateurRepository;
         this.scoringService = scoringService;
     }
 
-    /** Une page de résultats, en signalant les entreprises déjà importées. */
-    public CompanySearchResult search(TargetSegment segment, List<Departement> departements, int page) {
-
+    /** Une page de résultats, en signalant les entreprises que l'utilisateur a déjà importées. */
+    public CompanySearchResult search(Long utilisateurId, Profil profil, int page) {
         int safePage = clampPage(page);
-        ApiSearchResponse response = client.search(segment, departements, safePage);
+        ApiSearchResponse response = client.search(profil.getMotsCles(), profil.getDepartementsList(), safePage);
         List<ApiCompany> companies = response == null ? List.of() : response.safeResults();
 
-        Set<String> existing = findExisting(companies.stream().map(ApiCompany::siren).toList());
+        Set<String> existing = findExisting(utilisateurId, companies.stream().map(ApiCompany::siren).toList());
 
         List<CompanyCandidate> candidates = companies.stream()
                 .map(company -> toCandidate(company, existing.contains(company.siren())))
@@ -72,8 +75,8 @@ public class CompanyImportService {
      * dans l'API et on ne garde que les SIREN cochés. Seuls les SIREN viennent du formulaire.
      */
     @Transactional
-    public ImportReport importCompanies(TargetSegment segment, List<Departement> departements,
-                                        int page, Collection<String> selectedSirens) {
+    public ImportReport importCompanies(Long utilisateurId, Profil profil, int page,
+                                        Collection<String> selectedSirens) {
 
         Set<String> wanted = selectedSirens == null ? Set.of() : selectedSirens.stream()
                 .filter(siren -> siren != null && SIREN_PATTERN.matcher(siren).matches())
@@ -83,22 +86,25 @@ public class CompanyImportService {
             return new ImportReport(0, 0, 0);
         }
 
-        ApiSearchResponse response = client.search(segment, departements, clampPage(page));
+        ApiSearchResponse response = client.search(profil.getMotsCles(), profil.getDepartementsList(),
+                clampPage(page));
         List<ApiCompany> companies = response == null ? List.of() : response.safeResults();
 
         List<ApiCompany> selected = companies.stream()
                 .filter(company -> wanted.contains(company.siren()))
                 .toList();
 
-        Set<String> existing = findExisting(selected.stream().map(ApiCompany::siren).toList());
+        Set<String> existing = findExisting(utilisateurId, selected.stream().map(ApiCompany::siren).toList());
 
-        List<Prospect> toSave = new ArrayList<>();
+        List<Candidature> toSave = new ArrayList<>();
         for (ApiCompany company : selected) {
             if (!existing.contains(company.siren())) {
-                toSave.add(toProspect(company, segment));
+                Candidature candidature = toCandidature(company, profil);
+                candidature.setUtilisateur(utilisateurRepository.getReferenceById(utilisateurId));
+                toSave.add(candidature);
             }
         }
-        prospectRepository.saveAll(toSave);
+        candidatureRepository.saveAll(toSave);
 
         int notFound = wanted.size() - selected.size();
         return new ImportReport(toSave.size(), selected.size() - toSave.size(), notFound);
@@ -119,40 +125,31 @@ public class CompanyImportService {
                 alreadyImported);
     }
 
-    Prospect toProspect(ApiCompany company, TargetSegment segment) {
+    Candidature toCandidature(ApiCompany company, Profil profil) {
         ApiEtablissement siege = company.siege();
 
-        Prospect prospect = new Prospect();
-        prospect.setSiren(company.siren());
-        prospect.setName(truncate(company.nomComplet(), 150));
-        prospect.setCity(siege == null ? null : siege.libelleCommune());
-        prospect.setPostalCode(siege == null ? null : siege.codePostal());
-        prospect.setSector(segment.getSector());
-        prospect.setCodeNaf(company.activitePrincipale());
-        prospect.setTrancheEffectif(company.trancheEffectif());
-        prospect.setStatus(ProspectStatus.A_CONTACTER);
+        Candidature candidature = new Candidature();
+        candidature.setSiren(company.siren());
+        candidature.setEntreprise(truncate(company.nomComplet() == null ? "Entreprise " + company.siren()
+                : company.nomComplet(), 150));
+        candidature.setVille(truncate(siege == null ? null : siege.libelleCommune(), 100));
+        candidature.setCodePostal(siege == null ? null : truncate(siege.codePostal(), 10));
+        candidature.setCodeNaf(company.activitePrincipale());
+        candidature.setTrancheEffectif(company.trancheEffectif());
+        candidature.setStatut(StatutCandidature.A_ENVOYER);
+        candidature.setNotes("Candidature spontanée. Entreprise trouvée dans l'Annuaire des entreprises ("
+                + TrancheEffectif.libelle(company.trancheEffectif()) + ").");
 
-        // Le besoin reste une hypothèse : il va dans la description, pas dans "besoin potentiel".
-        // C'est à vous (ou à l'IA plus tard) de le confirmer.
-        prospect.setDescription(truncate(
-                segment.getLibelle() + " – " + TrancheEffectif.libelle(company.trancheEffectif())
-                        + (company.activitePrincipale() == null ? "" : " – NAF " + company.activitePrincipale())
-                        + ". Besoin probable : " + segment.getBesoinProbable()
-                        + ". Importé depuis l'Annuaire des entreprises.",
-                1000));
-
-        int score = scoringService.calculateScore(prospect);
-        prospect.setScore(score);
-        prospect.setQualification(scoringService.determineQualification(score));
-        return prospect;
+        scoringService.appliquer(candidature, profil);
+        return candidature;
     }
 
     // ----- Outils -----
 
-    private Set<String> findExisting(List<String> sirens) {
+    private Set<String> findExisting(Long utilisateurId, List<String> sirens) {
         List<String> valid = sirens.stream().filter(s -> s != null && !s.isBlank()).toList();
         // Une clause "IN ()" vide n'est pas acceptée par toutes les bases : on évite la requête
-        return valid.isEmpty() ? Set.of() : prospectRepository.findExistingSirens(valid);
+        return valid.isEmpty() ? Set.of() : candidatureRepository.findExistingSirens(utilisateurId, valid);
     }
 
     private static int clampPage(int page) {

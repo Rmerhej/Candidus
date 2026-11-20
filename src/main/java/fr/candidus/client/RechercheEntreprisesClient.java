@@ -1,9 +1,6 @@
 package fr.candidus.client;
 
 import fr.candidus.client.dto.ApiSearchResponse;
-import fr.candidus.enums.Departement;
-import fr.candidus.enums.TargetSegment;
-import fr.candidus.enums.TrancheEffectif;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
@@ -15,7 +12,6 @@ import org.springframework.web.client.RestClientException;
 
 import java.time.Duration;
 import java.util.List;
-import java.util.stream.Collectors;
 
 /**
  * Client HTTP de l'API publique Recherche d'entreprises (gratuite, sans clé).
@@ -56,36 +52,35 @@ public class RechercheEntreprisesClient {
     }
 
     /**
-     * Recherche les entreprises actives de 10 à 49 salariés d'un segment, dans les départements choisis.
-     *
-     * @param page numéro de page, à partir de 1 (convention de l'API)
+     * Tranches INSEE "au moins 1 salarié" : on écarte les entreprises sans salarié,
+     * qui ne recrutent quasiment jamais (codes 00 et NN).
      */
-    public ApiSearchResponse search(TargetSegment segment, List<Departement> departements, int page) {
+    static final String AVEC_SALARIES = "01,02,03,11,12,21,22,31,32,41,42,51,52,53";
 
-        String codesDepartements = departements.stream()
-                .map(Departement::getCode)
-                .collect(Collectors.joining(","));
+    /**
+     * Recherche les entreprises actives qui emploient des salariés, par mots-clés et départements.
+     *
+     * @param motsCles     texte libre, ex : "organisme de formation" (nom, activité, enseigne)
+     * @param departements codes de départements, ex : ["78", "92"]
+     * @param page         numéro de page, à partir de 1 (convention de l'API)
+     */
+    public ApiSearchResponse search(String motsCles, List<String> departements, int page) {
+
+        String codesDepartements = String.join(",", departements);
 
         try {
             return restClient.get()
-                    .uri(uriBuilder -> {
-                        uriBuilder.path("/search")
-                                .queryParam("departement", codesDepartements)
-                                .queryParam("tranche_effectif_salarie", TrancheEffectif.CIBLES)
-                                .queryParam("etat_administratif", "A")
-                                // Réponse allégée + adresse du siège (sans les dirigeants)
-                                .queryParam("minimal", "true")
-                                .queryParam("include", "siege")
-                                .queryParam("per_page", PER_PAGE)
-                                .queryParam("page", page);
-
-                        if (segment.isOrganismeFormation()) {
-                            uriBuilder.queryParam("est_organisme_formation", "true");
-                        } else {
-                            uriBuilder.queryParam("activite_principale", segment.getCodesNaf());
-                        }
-                        return uriBuilder.build();
-                    })
+                    .uri(uriBuilder -> uriBuilder.path("/search")
+                            .queryParam("q", motsCles)
+                            .queryParam("departement", codesDepartements)
+                            .queryParam("tranche_effectif_salarie", AVEC_SALARIES)
+                            .queryParam("etat_administratif", "A")
+                            // Réponse allégée + adresse du siège (sans les dirigeants)
+                            .queryParam("minimal", "true")
+                            .queryParam("include", "siege")
+                            .queryParam("per_page", PER_PAGE)
+                            .queryParam("page", page)
+                            .build())
                     .retrieve()
                     .body(ApiSearchResponse.class);
 

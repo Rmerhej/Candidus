@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Créer un compte')}"></head>
+
+<body class="bg-light">
+
+<main class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8 col-lg-6">
+
+            <div class="text-center mb-4">
+                <a th:href="@{/}" class="text-decoration-none">
+                    <i class="bi bi-briefcase display-5 text-primary"></i>
+                    <h1 class="h4 mt-2 text-dark">Créer mon compte Candidus</h1>
+                </a>
+            </div>
+
+            <div class="card border-0 shadow-sm">
+                <div class="card-body p-4">
+                    <form th:action="@{/inscription}" th:object="${form}" method="post" novalidate>
+
+                        <div class="row g-3">
+                            <div class="col-sm-6">
+                                <label for="prenom" class="form-label">Prénom</label>
+                                <input type="text" th:field="*{prenom}" class="form-control"
+                                       th:classappend="${#fields.hasErrors('prenom')} ? 'is-invalid'"
+                                       autocomplete="given-name" required>
+                                <div class="invalid-feedback" th:errors="*{prenom}"></div>
+                            </div>
+                            <div class="col-sm-6">
+                                <label for="nom" class="form-label">Nom</label>
+                                <input type="text" th:field="*{nom}" class="form-control"
+                                       th:classappend="${#fields.hasErrors('nom')} ? 'is-invalid'"
+                                       autocomplete="family-name" required>
+                                <div class="invalid-feedback" th:errors="*{nom}"></div>
+                            </div>
+                            <div class="col-12">
+                                <label for="email" class="form-label">Adresse e-mail</label>
+                                <input type="email" th:field="*{email}" class="form-control"
+                                       th:classappend="${#fields.hasErrors('email')} ? 'is-invalid'"
+                                       autocomplete="email" required>
+                                <div class="invalid-feedback" th:errors="*{email}"></div>
+                            </div>
+                            <div class="col-sm-6">
+                                <label for="motDePasse" class="form-label">Mot de passe</label>
+                                <input type="password" th:field="*{motDePasse}" class="form-control"
+                                       th:classappend="${#fields.hasErrors('motDePasse')} ? 'is-invalid'"
+                                       autocomplete="new-password" required>
+                                <div class="invalid-feedback" th:errors="*{motDePasse}"></div>
+                                <div class="form-text">10 caractères minimum.</div>
+                            </div>
+                            <div class="col-sm-6">
+                                <label for="confirmation" class="form-label">Confirmation</label>
+                                <input type="password" th:field="*{confirmation}" class="form-control"
+                                       th:classappend="${#fields.hasErrors('confirmation') or #fields.hasErrors('confirmationIdentique')} ? 'is-invalid'"
+                                       autocomplete="new-password" required>
+                                <div class="invalid-feedback" th:errors="*{confirmation}"></div>
+                                <div class="invalid-feedback" th:errors="*{confirmationIdentique}"></div>
+                            </div>
+                            <div class="col-12">
+                                <div class="form-check">
+                                    <input type="checkbox" th:field="*{accepteConditions}" class="form-check-input"
+                                           th:classappend="${#fields.hasErrors('accepteConditions')} ? 'is-invalid'">
+                                    <label class="form-check-label" th:for="${#ids.prev('accepteConditions')}">
+                                        J'accepte les conditions d'utilisation et la politique de confidentialité.
+                                    </label>
+                                    <div class="invalid-feedback" th:errors="*{accepteConditions}"></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <button type="submit" class="btn btn-primary w-100 mt-4">
+                            <i class="bi bi-person-plus"></i> Créer mon compte
+                        </button>
+                    </form>
+
+                    <p class="text-center small mt-3 mb-0">
+                        Déjà inscrit ? <a th:href="@{/login}">Se connecter</a>
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</main>
+
+</body>
+</html>

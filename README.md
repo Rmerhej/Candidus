@@ -9,9 +9,20 @@ Site : https://candidus.app (en préparation)
 
 ## État du projet
 
-Étape 1 : base technique reprise d'AI-Prospect-Hunter et renommée.
-Prochaines étapes : comptes utilisateurs, profil paramétrable (métier, zone, CV),
-suivi des candidatures et relances.
+Version 1 en cours (MVP) :
+
+- Comptes utilisateurs : inscription, connexion par e-mail, mots de passe hachés (BCrypt).
+  Chaque utilisateur ne voit que ses propres données.
+- Profil paramétrable : métier visé, type d'entreprises, départements, résumé du CV,
+  points forts, signature.
+- Suivi des candidatures : À envoyer → Envoyée → Relancée → Entretien / Refus / Embauche,
+  avec rappel de relance automatique 7 jours après l'envoi.
+- Recherche d'entreprises par mots-clés et départements (API Recherche d'entreprises),
+  pour les candidatures spontanées.
+- Lettre préparée par l'IA à partir du profil, relue et envoyée par l'utilisateur lui-même.
+
+À venir : application installable (PWA), abonnements (Stripe), pages légales (CGU, RGPD),
+suppression du compte, limites d'usage de l'IA par abonnement.
 
 ## Lancer le projet en local
 
@@ -19,8 +30,10 @@ suivi des candidatures et relances.
 2. `docker compose up -d --build`
 3. Ouvrir http://localhost:8081
 
+4. Cliquer sur « Créer mon compte ».
+
 MySQL écoute sur le port 3309 et l'application sur le port 8081 : Candidus peut
-tourner en même temps qu'AI-Prospect-Hunter.
+tourner en même temps que d'autres projets.
 
 ## Technique
 

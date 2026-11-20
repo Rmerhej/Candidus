@@ -1,0 +1,22 @@
+/* Candidus : gros boutons et textes lisibles, pensés pour le téléphone */
+body {
+    font-size: 1.05rem;
+}
+
+.btn {
+    padding: 0.55rem 1rem;
+}
+
+.card {
+    border-radius: 0.9rem;
+}
+
+.stat-number {
+    font-size: 2.2rem;
+    font-weight: 700;
+    line-height: 1;
+}
+
+.lettre {
+    white-space: pre-wrap;
+}

@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Mes candidatures')}"></head>
+
+<body class="bg-light">
+
+<nav th:replace="~{fragments/layout :: navbar}"></nav>
+
+<main class="container py-4">
+
+    <div th:replace="~{fragments/layout :: flash}"></div>
+
+    <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3">
+        <h1 class="h3 mb-0">Mes candidatures</h1>
+        <a th:href="@{/candidatures/nouvelle}" class="btn btn-primary">
+            <i class="bi bi-plus-circle"></i> Ajouter
+        </a>
+    </div>
+
+    <!-- Filtres -->
+    <form th:action="@{/candidatures}" method="get" class="card border-0 shadow-sm mb-3">
+        <div class="card-body row g-2 align-items-end">
+            <div class="col-md-6">
+                <label for="q" class="form-label small">Rechercher</label>
+                <input type="search" id="q" name="q" th:value="${q}" class="form-control"
+                       placeholder="Entreprise, poste ou ville">
+            </div>
+            <div class="col-md-4">
+                <label for="statut" class="form-label small">Statut</label>
+                <select id="statut" name="statut" class="form-select">
+                    <option value="">Tous</option>
+                    <option th:each="s : ${statuts}" th:value="${s}" th:text="${s.libelle}"
+                            th:selected="${s == statut}">Statut</option>
+                </select>
+            </div>
+            <div class="col-md-2 d-grid">
+                <button type="submit" class="btn btn-outline-primary"><i class="bi bi-funnel"></i> Filtrer</button>
+            </div>
+        </div>
+    </form>
+
+    <!-- Aucune candidature -->
+    <div th:if="${candidatures.empty}" class="card border-0 shadow-sm">
+        <div class="card-body p-5 text-center">
+            <i class="bi bi-inbox display-5 text-secondary"></i>
+            <p class="mt-3 mb-3" th:text="${hasFilters} ? 'Aucune candidature ne correspond à ces filtres.'
+                                                       : 'Vous n\'avez pas encore de candidature.'">
+                Aucune candidature.
+            </p>
+            <a th:unless="${hasFilters}" th:href="@{/entreprises}" class="btn btn-primary">
+                <i class="bi bi-building"></i> Trouver des entreprises
+            </a>
+        </div>
+    </div>
+
+    <!-- Liste en cartes : lisible sur téléphone comme sur ordinateur -->
+    <div th:unless="${candidatures.empty}" class="list-group shadow-sm">
+        <a th:each="c : ${candidatures.content}" th:href="@{/candidatures/{id}(id=${c.id})}"
+           class="list-group-item list-group-item-action py-3">
+            <div class="d-flex justify-content-between align-items-start gap-2">
+                <div>
+                    <div class="fw-semibold" th:text="${c.entreprise}">Entreprise</div>
+                    <div class="small text-secondary">
+                        <span th:if="${c.poste}" th:text="${c.poste}">Poste</span>
+                        <span th:if="${c.poste != null and c.ville != null}"> · </span>
+                        <span th:if="${c.ville}" th:text="${c.ville}">Ville</span>
+                    </div>
+                    <div th:if="${c.relanceDue}" class="small text-danger mt-1">
+                        <i class="bi bi-bell-fill"></i> Relance à faire
+                    </div>
+                </div>
+                <div class="text-end">
+                    <span class="badge" th:classappend="'text-bg-' + ${c.statut.couleur}"
+                          th:text="${c.statut.libelle}">Statut</span>
+                    <div class="small text-secondary mt-1" th:if="${c.score != null}"
+                         th:text="${c.qualification}">À étudier</div>
+                </div>
+            </div>
+        </a>
+    </div>
+
+    <!-- Pagination -->
+    <nav th:if="${totalPages > 1}" class="mt-3" aria-label="Pages">
+        <ul class="pagination justify-content-center">
+            <li class="page-item" th:classappend="${currentPage == 0} ? 'disabled'">
+                <a class="page-link"
+                   th:href="@{/candidatures(page=${currentPage - 1},size=${pageSize},statut=${statut},q=${q})}">Précédent</a>
+            </li>
+            <li class="page-item disabled">
+                <span class="page-link" th:text="${currentPage + 1} + ' / ' + ${totalPages}">1 / 1</span>
+            </li>
+            <li class="page-item" th:classappend="${currentPage + 1 >= totalPages} ? 'disabled'">
+                <a class="page-link"
+                   th:href="@{/candidatures(page=${currentPage + 1},size=${pageSize},statut=${statut},q=${q})}">Suivant</a>
+            </li>
+        </ul>
+    </nav>
+</main>
+
+<footer th:replace="~{fragments/layout :: footer}"></footer>
+<th:block th:replace="~{fragments/layout :: scripts}"></th:block>
+</body>
+</html>

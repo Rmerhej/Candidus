@@ -1,32 +1,26 @@
 package fr.candidus.dto;
 
+import fr.candidus.entity.Candidature;
+
 import java.util.List;
 
 /**
  * Chiffres du tableau de bord, prêts à afficher.
  *
- * @param tauxReponse    pourcentage de prospects contactés qui ont répondu, ou null si personne n'a été contacté
- * @param tauxConversion pourcentage de prospects contactés devenus clients, ou null si personne n'a été contacté
+ * @param tauxReponse pourcentage de candidatures envoyées qui ont reçu une réponse,
+ *                    ou null si aucune n'a encore été envoyée
  */
 public record DashboardStats(
         long total,
-        long analyses,
-        long prioritaires,
-        long contactes,
+        long envoyees,
         long reponses,
-        long clients,
+        long entretiens,
         Integer tauxReponse,
-        Integer tauxConversion,
         List<CountItem> parStatut,
-        List<CountItem> parSecteur,
-        List<CountItem> parQualification
+        List<Candidature> relancesDues
 ) {
 
-    /**
-     * Une ligne d'un graphique en barres.
-     *
-     * @param pourcentage part du total (0 à 100), pour la largeur de la barre
-     */
-    public record CountItem(String libelle, long nombre, int pourcentage) {
+    /** Une ligne de répartition : libellé, nombre, pourcentage du total et couleur du badge. */
+    public record CountItem(String libelle, long nombre, int pourcentage, String couleur) {
     }
 }

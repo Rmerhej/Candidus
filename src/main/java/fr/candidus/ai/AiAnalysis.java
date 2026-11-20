@@ -5,17 +5,17 @@ package fr.candidus.ai;
  * Spring AI demande au modèle de répondre en JSON avec exactement ces champs,
  * puis convertit ce JSON en record Java (méthode .entity(AiAnalysis.class)).
  *
- * @param pertinence      0 à 100 : probabilité que l'entreprise ait besoin d'une app de planning / présences
- * @param analyse         3 à 5 phrases qui expliquent la note
- * @param besoinPotentiel une phrase décrivant le besoin le plus probable
- * @param objetEmail      objet du brouillon d'e-mail
- * @param corpsEmail      corps du brouillon (sans signature ni mention de désinscription)
+ * @param adequation    0 à 100 : adéquation entre le profil du candidat et l'entreprise
+ * @param analyse       3 à 5 phrases qui expliquent la note
+ * @param posteSuggere  le poste le plus plausible pour ce candidat dans cette entreprise
+ * @param objetLettre   objet de l'e-mail de candidature
+ * @param corpsLettre   texte de la candidature (sans signature : elle est ajoutée automatiquement)
  */
 public record AiAnalysis(
-        int pertinence,
+        int adequation,
         String analyse,
-        String besoinPotentiel,
-        String objetEmail,
-        String corpsEmail
+        String posteSuggere,
+        String objetLettre,
+        String corpsLettre
 ) {
 }

@@ -6,136 +6,95 @@
 
 <nav th:replace="~{fragments/layout :: navbar}"></nav>
 
-<!-- "stats" et ses éléments sont des records : on appelle leurs accesseurs avec des parenthèses -->
-<main class="container py-5" th:with="s=${stats}">
+<main class="container py-4">
 
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <div>
-            <h1 class="h3 mb-1">Tableau de bord</h1>
-            <p class="text-secondary mb-0">Où en est votre prospection.</p>
+    <div th:replace="~{fragments/layout :: flash}"></div>
+
+    <h1 class="h3 mb-4">Bonjour <span th:text="${prenom}">Karim</span> 👋</h1>
+
+    <!-- Premier pas : compléter le profil -->
+    <div th:unless="${profilPret}" class="alert alert-info d-flex align-items-center gap-3" role="alert">
+        <i class="bi bi-person-gear fs-3"></i>
+        <div class="flex-grow-1">
+            <strong>Première étape : votre profil.</strong>
+            Indiquez le métier que vous cherchez et vos départements : Candidus pourra alors
+            vous proposer des entreprises et préparer vos lettres.
         </div>
-        <a th:href="@{/prospects}" class="btn btn-outline-primary">
-            <i class="bi bi-list-ul"></i> Voir les prospects
-        </a>
+        <a th:href="@{/profil}" class="btn btn-primary">Compléter</a>
     </div>
 
-    <div th:if="${s.total() == 0}" class="alert alert-info">
-        Aucun prospect pour le moment.
-        <a th:href="@{/import}" class="alert-link">Importez vos premières entreprises</a>.
-    </div>
-
-    <!-- Indicateurs clés -->
+    <!-- Chiffres clés -->
     <div class="row g-3 mb-4">
         <div class="col-6 col-lg-3">
-            <div class="card border-0 shadow-sm h-100">
-                <div class="card-body">
-                    <div class="text-secondary small">Prospects</div>
-                    <div class="display-6 fw-bold" th:text="${s.total()}">0</div>
-                    <div class="small">
-                        dont <strong th:text="${s.prioritaires()}">0</strong> prioritaire(s)
-                    </div>
-                </div>
-            </div>
+            <div class="card border-0 shadow-sm h-100"><div class="card-body">
+                <div class="stat-number" th:text="${stats.total}">0</div>
+                <div class="text-secondary">Candidatures</div>
+            </div></div>
         </div>
         <div class="col-6 col-lg-3">
-            <div class="card border-0 shadow-sm h-100">
-                <div class="card-body">
-                    <div class="text-secondary small"><i class="bi bi-stars"></i> Analysés par l'IA</div>
-                    <div class="display-6 fw-bold" th:text="${s.analyses()}">0</div>
-                    <div class="small text-secondary"
-                         th:text="${s.total() > 0} ? ${(s.analyses() * 100 / s.total()) + ' % des prospects'} : '—'"></div>
-                </div>
-            </div>
+            <div class="card border-0 shadow-sm h-100"><div class="card-body">
+                <div class="stat-number text-primary" th:text="${stats.envoyees}">0</div>
+                <div class="text-secondary">Envoyées</div>
+            </div></div>
         </div>
         <div class="col-6 col-lg-3">
-            <div class="card border-0 shadow-sm h-100">
-                <div class="card-body">
-                    <div class="text-secondary small"><i class="bi bi-reply"></i> Taux de réponse</div>
-                    <div class="display-6 fw-bold"
-                         th:text="${s.tauxReponse() != null} ? ${s.tauxReponse() + ' %'} : '—'">—</div>
-                    <div class="small text-secondary">
-                        <span th:text="${s.reponses()}">0</span> réponse(s) sur
-                        <span th:text="${s.contactes()}">0</span> contacté(s)
-                    </div>
-                </div>
-            </div>
+            <div class="card border-0 shadow-sm h-100"><div class="card-body">
+                <div class="stat-number text-success" th:text="${stats.entretiens}">0</div>
+                <div class="text-secondary">Entretiens obtenus</div>
+            </div></div>
         </div>
         <div class="col-6 col-lg-3">
-            <div class="card border-0 shadow-sm h-100">
-                <div class="card-body">
-                    <div class="text-secondary small"><i class="bi bi-trophy"></i> Clients</div>
-                    <div class="display-6 fw-bold text-success" th:text="${s.clients()}">0</div>
-                    <div class="small text-secondary"
-                         th:text="${s.tauxConversion() != null} ? ${'Conversion : ' + s.tauxConversion() + ' %'} : '—'"></div>
-                </div>
-            </div>
+            <div class="card border-0 shadow-sm h-100"><div class="card-body">
+                <div class="stat-number"
+                     th:text="${stats.tauxReponse == null} ? '—' : ${stats.tauxReponse} + ' %'">—</div>
+                <div class="text-secondary">Taux de réponse</div>
+            </div></div>
         </div>
     </div>
 
     <div class="row g-4">
-
-        <!-- Suivi commercial -->
-        <div class="col-lg-6">
+        <!-- Relances à faire -->
+        <div class="col-lg-7">
             <div class="card border-0 shadow-sm h-100">
                 <div class="card-body">
-                    <h2 class="h5 mb-3">Suivi commercial</h2>
-                    <div th:each="item : ${s.parStatut()}" class="mb-2">
-                        <div class="d-flex justify-content-between small">
-                            <span th:text="${item.libelle()}"></span>
-                            <span><strong th:text="${item.nombre()}">0</strong></span>
-                        </div>
-                        <div class="progress" style="height: 8px;" role="progressbar"
-                             th:attr="aria-label=${item.libelle()},aria-valuenow=${item.pourcentage()}"
-                             aria-valuemin="0" aria-valuemax="100">
-                            <div class="progress-bar"
-                                 th:classappend="${item.libelle() == 'Client'} ? 'bg-success'
-                                                : (${item.libelle() == 'Perdu'} ? 'bg-secondary' : '')"
-                                 th:style="'width: ' + ${item.pourcentage()} + '%'"></div>
-                        </div>
-                    </div>
+                    <h2 class="h5 mb-3"><i class="bi bi-bell"></i> Relances à faire</h2>
+                    <p th:if="${#lists.isEmpty(stats.relancesDues)}" class="text-secondary mb-0">
+                        Aucune relance aujourd'hui. Profitez-en pour envoyer de nouvelles candidatures !
+                    </p>
+                    <ul th:unless="${#lists.isEmpty(stats.relancesDues)}" class="list-group list-group-flush">
+                        <li th:each="c : ${stats.relancesDues}"
+                            class="list-group-item d-flex justify-content-between align-items-center px-0">
+                            <div>
+                                <a th:href="@{/candidatures/{id}(id=${c.id})}" class="fw-semibold"
+                                   th:text="${c.entreprise}">Entreprise</a>
+                                <div class="small text-secondary">
+                                    Envoyée le <span th:text="${#temporals.format(c.dateEnvoi, 'dd/MM/yyyy')}">01/01/2026</span>
+                                </div>
+                            </div>
+                            <form th:action="@{/candidatures/{id}/relancee(id=${c.id})}" method="post">
+                                <button type="submit" class="btn btn-sm btn-outline-primary">J'ai relancé</button>
+                            </form>
+                        </li>
+                    </ul>
                 </div>
             </div>
         </div>
 
-        <div class="col-lg-6">
-
-            <!-- Qualification -->
-            <div class="card border-0 shadow-sm mb-4">
+        <!-- Répartition par statut -->
+        <div class="col-lg-5">
+            <div class="card border-0 shadow-sm h-100">
                 <div class="card-body">
-                    <h2 class="h5 mb-3">Qualification</h2>
-                    <p th:if="${#lists.isEmpty(s.parQualification())}" class="text-secondary mb-0">—</p>
-                    <div th:each="item : ${s.parQualification()}" class="mb-2">
+                    <h2 class="h5 mb-3"><i class="bi bi-bar-chart"></i> Où en sont mes candidatures</h2>
+                    <div th:each="item : ${stats.parStatut}" class="mb-2">
                         <div class="d-flex justify-content-between small">
-                            <span th:text="${item.libelle()}"></span>
-                            <strong th:text="${item.nombre()}">0</strong>
+                            <span th:text="${item.libelle}">Statut</span>
+                            <span th:text="${item.nombre}">0</span>
                         </div>
-                        <div class="progress" style="height: 8px;" role="progressbar"
-                             th:attr="aria-label=${item.libelle()},aria-valuenow=${item.pourcentage()}"
+                        <div class="progress" role="progressbar" style="height: 8px"
+                             th:attr="aria-valuenow=${item.pourcentage},aria-label=${item.libelle}"
                              aria-valuemin="0" aria-valuemax="100">
-                            <div class="progress-bar"
-                                 th:classappend="${item.libelle() == 'Prioritaire'} ? 'bg-success'
-                                                : (${item.libelle() == 'À étudier'} ? 'bg-warning' : 'bg-secondary')"
-                                 th:style="'width: ' + ${item.pourcentage()} + '%'"></div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Secteurs -->
-            <div class="card border-0 shadow-sm">
-                <div class="card-body">
-                    <h2 class="h5 mb-3">Secteurs</h2>
-                    <p th:if="${#lists.isEmpty(s.parSecteur())}" class="text-secondary mb-0">—</p>
-                    <div th:each="item : ${s.parSecteur()}" class="mb-2">
-                        <div class="d-flex justify-content-between small">
-                            <span th:text="${item.libelle()}"></span>
-                            <strong th:text="${item.nombre()}">0</strong>
-                        </div>
-                        <div class="progress" style="height: 8px;" role="progressbar"
-                             th:attr="aria-label=${item.libelle()},aria-valuenow=${item.pourcentage()}"
-                             aria-valuemin="0" aria-valuemax="100">
-                            <div class="progress-bar bg-info"
-                                 th:style="'width: ' + ${item.pourcentage()} + '%'"></div>
+                            <div class="progress-bar" th:classappend="'bg-' + ${item.couleur}"
+                                 th:style="'width: ' + ${item.pourcentage} + '%'"></div>
                         </div>
                     </div>
                 </div>
@@ -143,13 +102,13 @@
         </div>
     </div>
 
-    <p class="text-secondary small mt-4 mb-0">
-        Taux de réponse = prospects « A répondu » ou « Client » ÷ prospects contactés
-        (Contacté, Relancé, A répondu, Client, Perdu). Pensez à mettre à jour les statuts après chaque échange.
-    </p>
-
+    <div class="d-flex flex-wrap gap-2 mt-4">
+        <a th:href="@{/entreprises}" class="btn btn-primary"><i class="bi bi-building"></i> Trouver des entreprises</a>
+        <a th:href="@{/candidatures/nouvelle}" class="btn btn-outline-primary"><i class="bi bi-plus-circle"></i> Ajouter une candidature</a>
+    </div>
 </main>
 
+<footer th:replace="~{fragments/layout :: footer}"></footer>
 <th:block th:replace="~{fragments/layout :: scripts}"></th:block>
 </body>
 </html>

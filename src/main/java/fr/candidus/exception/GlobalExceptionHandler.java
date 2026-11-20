@@ -14,14 +14,14 @@ import org.springframework.web.method.annotation.MethodArgumentTypeMismatchExcep
 @ControllerAdvice
 public class GlobalExceptionHandler {
 
-    @ExceptionHandler(ProspectNotFoundException.class)
+    @ExceptionHandler(CandidatureNotFoundException.class)
     @ResponseStatus(HttpStatus.NOT_FOUND)
-    public String handleProspectNotFound(ProspectNotFoundException ex, Model model) {
+    public String handleCandidatureNotFound(CandidatureNotFoundException ex, Model model) {
         model.addAttribute("errorMessage", ex.getMessage());
         return "error/not-found";
     }
 
-    // Ex : /prospects/modifier/abc ou /prospects?page=abc
+    // Ex : /candidatures/abc ou /candidatures?page=abc
     @ExceptionHandler(MethodArgumentTypeMismatchException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public String handleBadParameter(Model model) {

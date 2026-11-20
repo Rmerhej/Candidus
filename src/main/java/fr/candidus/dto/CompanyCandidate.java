@@ -3,7 +3,7 @@ package fr.candidus.dto;
 /**
  * Une entreprise trouvée par l'API, affichée dans la page d'import.
  *
- * @param alreadyImported vrai si ce SIREN est déjà dans vos prospects
+ * @param alreadyImported vrai si ce SIREN est déjà dans vos candidatures
  */
 public record CompanyCandidate(
         String siren,

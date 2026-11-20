@@ -46,21 +46,9 @@ server:
 candidus:
   ai:
     # Clé lue dans le fichier .env (GEMINI_API_KEY). Valeur par défaut : l'application démarre
-    # sans clé, et la fiche prospect affiche un message clair au lieu de planter.
+    # sans clé, et la fiche candidature affiche un message clair au lieu de planter.
     api-key: ${GEMINI_API_KEY:a-configurer}
 
   api:
     recherche-entreprises:
       base-url: https://recherche-entreprises.api.gouv.fr
-
-  # Connexion à l'application (lus dans .env)
-  security:
-    username: ${APP_USERNAME:roland}
-    password: ${APP_PASSWORD:}
-
-  # Signature ajoutée automatiquement à chaque brouillon d'e-mail
-  signature:
-    nom: Roland Merhej
-    titre: Développeur d'applications web (titre professionnel CDA)
-    ville: Chatou
-    lien: https://www.linkedin.com/in/rolandmerhej

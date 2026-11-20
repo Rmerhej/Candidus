@@ -2,8 +2,6 @@ package fr.candidus.client;
 
 import fr.candidus.client.dto.ApiCompany;
 import fr.candidus.client.dto.ApiSearchResponse;
-import fr.candidus.enums.Departement;
-import fr.candidus.enums.TargetSegment;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpMethod;
@@ -16,12 +14,12 @@ import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 
+import static org.hamcrest.Matchers.startsWith;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.method;
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.requestTo;
 import static org.springframework.test.web.client.response.MockRestResponseCreators.withServerError;
 import static org.springframework.test.web.client.response.MockRestResponseCreators.withSuccess;
-import static org.hamcrest.Matchers.startsWith;
 
 /**
  * Aucun appel réseau : MockRestServiceServer simule l'API et vérifie la requête envoyée.
@@ -66,19 +64,18 @@ class RechercheEntreprisesClientTest {
     }
 
     @Test
-    void organismesDeFormationUtilisentLeFiltreDedie() {
+    void rechercheParMotsClesEtDepartements() {
         server.expect(requestTo(startsWith(BASE_URL + "/search")))
                 .andExpect(method(HttpMethod.GET))
-                .andExpect(queryContains("est_organisme_formation=true"))
+                .andExpect(queryContains("q=organisme de formation"))
                 .andExpect(queryContains("departement=78,92"))
-                .andExpect(queryContains("tranche_effectif_salarie=11,12"))
+                .andExpect(queryContains("tranche_effectif_salarie=" + RechercheEntreprisesClient.AVEC_SALARIES))
                 .andExpect(queryContains("etat_administratif=A"))
                 .andExpect(queryContains("per_page=25"))
                 .andExpect(queryContains("page=2"))
                 .andRespond(withSuccess(JSON, MediaType.APPLICATION_JSON));
 
-        ApiSearchResponse response = client.search(
-                TargetSegment.FORMATION, List.of(Departement.values()), 2);
+        ApiSearchResponse response = client.search("organisme de formation", List.of("78", "92"), 2);
 
         server.verify();
         assertEquals(1, response.totalResults());
@@ -92,27 +89,15 @@ class RechercheEntreprisesClientTest {
     }
 
     @Test
-    void pmeUtilisentLesCodesNaf() {
-        server.expect(requestTo(startsWith(BASE_URL + "/search")))
-                .andExpect(queryContains("activite_principale=56.10A,56.10C,56.21Z"))
-                .andExpect(queryContains("departement=92"))
-                .andRespond(withSuccess(JSON, MediaType.APPLICATION_JSON));
-
-        client.search(TargetSegment.RESTAURATION, List.of(Departement.HAUTS_DE_SEINE), 1);
-
-        server.verify();
-    }
-
-    @Test
     void erreurDeLApiDevientApiUnavailableException() {
         server.expect(requestTo(startsWith(BASE_URL + "/search")))
                 .andRespond(withServerError());
 
         assertThrows(ApiUnavailableException.class,
-                () -> client.search(TargetSegment.NETTOYAGE, List.of(Departement.YVELINES), 1));
+                () -> client.search("boulangerie", List.of("78"), 1));
     }
 
-    /** Vérifie un paramètre dans l'URL, quel que soit l'encodage des virgules (%2C ou ","). */
+    /** Vérifie un paramètre dans l'URL, quel que soit l'encodage (%2C, %20, +). */
     private static RequestMatcher queryContains(String expected) {
         return request -> {
             String query = URLDecoder.decode(request.getURI().getRawQuery(), StandardCharsets.UTF_8);

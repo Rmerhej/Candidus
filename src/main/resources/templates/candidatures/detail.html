@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Candidature')}"></head>
+
+<body class="bg-light">
+
+<nav th:replace="~{fragments/layout :: navbar}"></nav>
+
+<main class="container py-4">
+
+    <div th:replace="~{fragments/layout :: flash}"></div>
+
+    <a th:href="@{/candidatures}" class="small text-decoration-none"><i class="bi bi-arrow-left"></i> Mes candidatures</a>
+
+    <div class="d-flex flex-wrap justify-content-between align-items-start gap-2 mt-2 mb-4">
+        <div>
+            <h1 class="h3 mb-1" th:text="${candidature.entreprise}">Entreprise</h1>
+            <div class="text-secondary">
+                <span th:if="${candidature.poste}" th:text="${candidature.poste}">Poste</span>
+                <span th:if="${candidature.ville}">
+                    · <span th:text="${candidature.ville}">Ville</span>
+                    <span th:if="${candidature.codePostal}" th:text="'(' + ${candidature.codePostal} + ')'">(78400)</span>
+                </span>
+            </div>
+        </div>
+        <span class="badge fs-6" th:classappend="'text-bg-' + ${candidature.statut.couleur}"
+              th:text="${candidature.statut.libelle}">Statut</span>
+    </div>
+
+    <div class="row g-4">
+
+        <!-- Colonne gauche : suivi et informations -->
+        <div class="col-lg-5">
+
+            <div class="card border-0 shadow-sm mb-4">
+                <div class="card-body">
+                    <h2 class="h5 mb-3"><i class="bi bi-signpost-split"></i> Suivi</h2>
+
+                    <div th:if="${candidature.relanceDue}" class="alert alert-warning py-2">
+                        <i class="bi bi-bell-fill"></i> C'est le moment de relancer cet employeur.
+                    </div>
+
+                    <dl class="row small mb-3">
+                        <dt class="col-6">Envoyée le</dt>
+                        <dd class="col-6" th:text="${candidature.dateEnvoi != null} ? ${#temporals.format(candidature.dateEnvoi, 'dd/MM/yyyy')} : '—'">—</dd>
+                        <dt class="col-6">Relance prévue le</dt>
+                        <dd class="col-6" th:text="${candidature.dateRelance != null} ? ${#temporals.format(candidature.dateRelance, 'dd/MM/yyyy')} : '—'">—</dd>
+                        <dt class="col-6">Priorité</dt>
+                        <dd class="col-6" th:text="${candidature.qualification} ?: '—'">—</dd>
+                    </dl>
+
+                    <div class="d-grid gap-2">
+                        <form th:if="${candidature.statut.name() == 'A_ENVOYER'}"
+                              th:action="@{/candidatures/{id}/envoyee(id=${candidature.id})}" method="post" class="d-grid">
+                            <button type="submit" class="btn btn-success"><i class="bi bi-send-check"></i> Je l'ai envoyée</button>
+                        </form>
+                        <form th:if="${candidature.statut.name() == 'ENVOYEE' or candidature.statut.name() == 'RELANCEE'}"
+                              th:action="@{/candidatures/{id}/relancee(id=${candidature.id})}" method="post" class="d-grid">
+                            <button type="submit" class="btn btn-outline-primary"><i class="bi bi-arrow-repeat"></i> J'ai relancé</button>
+                        </form>
+                        <a th:href="@{/candidatures/{id}/modifier(id=${candidature.id})}" class="btn btn-outline-secondary">
+                            <i class="bi bi-pencil"></i> Modifier (statut, dates, notes…)
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card border-0 shadow-sm mb-4">
+                <div class="card-body">
+                    <h2 class="h5 mb-3"><i class="bi bi-building"></i> L'entreprise</h2>
+                    <dl class="row small mb-0">
+                        <dt class="col-5">Effectif</dt>
+                        <dd class="col-7" th:text="${trancheLibelle}">—</dd>
+                        <th:block th:if="${candidature.siren}">
+                            <dt class="col-5">SIREN</dt>
+                            <dd class="col-7">
+                                <a th:href="'https://annuaire-entreprises.data.gouv.fr/entreprise/' + ${candidature.siren}"
+                                   target="_blank" rel="noopener" th:text="${candidature.siren}">000000000</a>
+                            </dd>
+                        </th:block>
+                        <th:block th:if="${candidature.siteWeb}">
+                            <dt class="col-5">Site web</dt>
+                            <dd class="col-7 text-break">
+                                <a th:href="${candidature.siteWeb}" target="_blank" rel="noopener nofollow"
+                                   th:text="${candidature.siteWeb}">site</a>
+                            </dd>
+                        </th:block>
+                        <th:block th:if="${candidature.offreUrl}">
+                            <dt class="col-5">Offre</dt>
+                            <dd class="col-7 text-break">
+                                <a th:href="${candidature.offreUrl}" target="_blank" rel="noopener nofollow">Voir l'annonce</a>
+                            </dd>
+                        </th:block>
+                    </dl>
+                    <p th:if="${candidature.notes}" class="small mt-3 mb-0 lettre" th:text="${candidature.notes}">Notes</p>
+                </div>
+            </div>
+
+            <form th:action="@{/candidatures/{id}/supprimer(id=${candidature.id})}" method="post"
+                  onsubmit="return confirm('Supprimer définitivement cette candidature ?');">
+                <button type="submit" class="btn btn-link text-danger p-0 small">
+                    <i class="bi bi-trash"></i> Supprimer cette candidature
+                </button>
+            </form>
+        </div>
+
+        <!-- Colonne droite : IA et lettre -->
+        <div class="col-lg-7">
+
+            <div class="card border-0 shadow-sm mb-4">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h2 class="h5 mb-0"><i class="bi bi-stars"></i> Préparer avec l'IA</h2>
+                        <form th:action="@{/candidatures/{id}/preparer(id=${candidature.id})}" method="post"
+                              data-loading>
+                            <button type="submit" class="btn btn-primary btn-sm">
+                                <span th:text="${candidature.analysedAt == null} ? 'Préparer ma lettre' : 'Refaire'">Préparer</span>
+                            </button>
+                        </form>
+                    </div>
+
+                    <p th:if="${candidature.analysedAt == null}" class="text-secondary small mb-0">
+                        L'IA lit votre profil et les informations sur l'entreprise, puis vous propose une lettre.
+                        Pensez à compléter <a th:href="@{/profil}">votre profil</a> pour un meilleur résultat.
+                    </p>
+
+                    <div th:if="${candidature.analysedAt != null}">
+                        <div class="d-flex align-items-center gap-2 mb-2">
+                            <span class="small text-secondary">Adéquation avec votre profil :</span>
+                            <strong th:text="${candidature.aiAdequation} + ' / 100'">0 / 100</strong>
+                        </div>
+                        <p class="small mb-2" th:if="${candidature.aiPosteSuggere}">
+                            <span class="text-secondary">Poste le plus plausible :</span>
+                            <span th:text="${candidature.aiPosteSuggere}">Poste</span>
+                        </p>
+                        <p class="small lettre mb-0" th:text="${candidature.aiAnalyse}">Analyse</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card border-0 shadow-sm">
+                <div class="card-body">
+                    <h2 class="h5 mb-3"><i class="bi bi-envelope-paper"></i> Ma lettre</h2>
+
+                    <form th:action="@{/candidatures/{id}/lettre(id=${candidature.id})}" th:object="${lettre}"
+                          method="post" novalidate>
+                        <div class="mb-3">
+                            <label for="subject" class="form-label">Objet</label>
+                            <input type="text" th:field="*{subject}" class="form-control"
+                                   th:classappend="${#fields.hasErrors('subject')} ? 'is-invalid'">
+                            <div class="invalid-feedback" th:errors="*{subject}"></div>
+                        </div>
+                        <div class="mb-3">
+                            <label for="body" class="form-label">Texte</label>
+                            <textarea th:field="*{body}" class="form-control" rows="14"
+                                      th:classappend="${#fields.hasErrors('body')} ? 'is-invalid'"></textarea>
+                            <div class="invalid-feedback" th:errors="*{body}"></div>
+                        </div>
+                        <div class="d-flex flex-wrap gap-2">
+                            <button type="submit" class="btn btn-outline-primary">
+                                <i class="bi bi-save"></i> Enregistrer
+                            </button>
+                            <button type="button" class="btn btn-outline-secondary" data-copy="#body">
+                                <i class="bi bi-clipboard"></i> Copier le texte
+                            </button>
+                        </div>
+                    </form>
+                    <p class="small text-secondary mt-3 mb-0">
+                        Relisez et personnalisez toujours la lettre : c'est vous qui l'envoyez, depuis votre messagerie.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</main>
+
+<footer th:replace="~{fragments/layout :: footer}"></footer>
+<th:block th:replace="~{fragments/layout :: scripts}"></th:block>
+<script th:src="@{/js/detail.js}" defer></script>
+</body>
+</html>
