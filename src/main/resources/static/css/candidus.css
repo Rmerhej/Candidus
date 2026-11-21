@@ -441,7 +441,7 @@ a.item:hover { border-color: var(--field-border); }
 }
 
 /* ----- Accueil : texte + aperçu du téléphone ----- */
-.hero-grid { display: grid; gap: 40px; align-items: center; grid-template-columns: 1fr; }
+.hero-grid { display: grid; gap: 40px; align-items: center; grid-template-columns: minmax(0, 1fr); }
 @media (min-width: 900px) { .hero-grid { grid-template-columns: minmax(0, 1.15fr) minmax(0, 0.85fr); } }
 
 .phone-stage {
