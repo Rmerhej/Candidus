@@ -88,6 +88,13 @@
 
 html { -webkit-text-size-adjust: 100%; }
 
+/* Téléphone : la page ne doit jamais glisser à gauche ou à droite.
+   "clip" coupe ce qui dépasse sans casser les éléments collants ; "hidden" pour les anciens navigateurs. */
+html, body { overflow-x: hidden; }
+@supports (overflow: clip) {
+    html, body { overflow-x: clip; }
+}
+
 body {
     margin: 0;
     background: var(--ground);
@@ -95,12 +102,17 @@ body {
     font-family: var(--font-sans);
     font-size: 17px;
     line-height: 1.55;
+    /* Un mot ou une adresse web très longs passent à la ligne au lieu d'élargir la page */
+    overflow-wrap: break-word;
 }
 
 a { color: var(--brand); font-weight: 700; }
 a:hover { text-decoration-thickness: 2px; }
 
-h1, h2, h3 { margin: 0; line-height: 1.12; }
+h1, h2, h3 { margin: 0; line-height: 1.12; hyphens: auto; }
+
+img, video, iframe, table, pre { max-width: 100%; }
+pre { overflow-x: auto; }
 
 img, svg { vertical-align: middle; }
 
