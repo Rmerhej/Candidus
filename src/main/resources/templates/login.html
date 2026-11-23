@@ -25,6 +25,10 @@
             <svg class="icon" aria-hidden="true"><use href="#i-check"></use></svg>
             <span>Vous êtes déconnecté. À bientôt !</span>
         </div>
+        <div th:if="${param.supprime}" class="flash flash-success" role="status">
+            <svg class="icon" aria-hidden="true"><use href="#i-check"></use></svg>
+            <span>Votre compte et toutes vos données ont été supprimés définitivement.</span>
+        </div>
         <div th:if="${param.inscrit}" class="flash flash-success" role="status">
             <svg class="icon" aria-hidden="true"><use href="#i-check"></use></svg>
             <span>Compte créé ! Connectez-vous pour commencer.</span>

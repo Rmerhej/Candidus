@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Mon compte')}"></head>
+
+<body>
+<svg th:replace="~{fragments/layout :: icons}"></svg>
+<header th:replace="~{fragments/layout :: header('compte')}"></header>
+
+<main class="container page">
+    <div class="narrow stack">
+        <th:block th:replace="~{fragments/layout :: flash}"></th:block>
+
+        <div>
+            <h1 class="title">Mon compte</h1>
+            <p class="muted">Connecté avec l'adresse <strong th:text="${email}">vous@exemple.fr</strong></p>
+        </div>
+
+        <section class="card stack" aria-labelledby="titre-mdp">
+            <h2 class="hand-m verb-trouver" id="titre-mdp">Changer mon mot de passe</h2>
+            <form th:action="@{/compte/mot-de-passe}" method="post" class="stack">
+                <div class="field">
+                    <label for="actuel">Mot de passe actuel</label>
+                    <input type="password" id="actuel" name="actuel" class="input"
+                           autocomplete="current-password" required>
+                </div>
+                <div class="field">
+                    <label for="nouveau">Nouveau mot de passe</label>
+                    <input type="password" id="nouveau" name="nouveau" class="input"
+                           autocomplete="new-password" minlength="10" maxlength="72" required>
+                    <span class="help">Entre 10 et 72 caractères.</span>
+                </div>
+                <div class="field">
+                    <label for="confirmation">Confirmer le nouveau mot de passe</label>
+                    <input type="password" id="confirmation" name="confirmation" class="input"
+                           autocomplete="new-password" minlength="10" maxlength="72" required>
+                </div>
+                <button type="submit" class="btn btn-primary btn-lg btn-block">Enregistrer le nouveau mot de passe</button>
+            </form>
+        </section>
+
+        <section class="card stack" aria-labelledby="titre-suppression">
+            <h2 class="hand-m" id="titre-suppression" style="color: var(--danger)">Supprimer mon compte</h2>
+            <p>
+                La suppression est <strong>définitive</strong> : votre compte, votre profil et toutes vos
+                candidatures sont effacés et ne peuvent pas être récupérés.
+            </p>
+            <form th:action="@{/compte/supprimer}" method="post" class="stack">
+                <div class="field">
+                    <label for="motDePasse">Votre mot de passe</label>
+                    <input type="password" id="motDePasse" name="motDePasse" class="input"
+                           autocomplete="current-password" required>
+                </div>
+                <div class="check">
+                    <input type="checkbox" id="confirmationSuppression" name="confirmation" value="oui" required>
+                    <label for="confirmationSuppression">Je comprends que la suppression de mon compte est définitive.</label>
+                </div>
+                <button type="submit" class="btn btn-primary btn-lg btn-block"
+                        style="background: var(--danger); color: #FFFFFF">Supprimer définitivement mon compte</button>
+            </form>
+        </section>
+    </div>
+</main>
+
+<footer th:replace="~{fragments/layout :: footer}"></footer>
+<nav th:replace="~{fragments/layout :: tabbar('profil')}"></nav>
+</body>
+</html>

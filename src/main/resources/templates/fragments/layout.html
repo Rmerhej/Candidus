@@ -98,6 +98,10 @@
                 <svg class="icon sun" aria-hidden="true"><use href="#i-sun"></use></svg>
                 <svg class="icon moon" aria-hidden="true"><use href="#i-moon"></use></svg>
             </button>
+            <a th:href="@{/compte}" class="btn btn-secondary btn-icon" aria-label="Mon compte" title="Mon compte"
+               th:aria-current="${active == 'compte'} ? 'page'">
+                <svg class="icon" aria-hidden="true"><use href="#i-user"></use></svg>
+            </a>
             <!-- Déconnexion en POST (avec jeton CSRF) : un simple lien ne suffit pas -->
             <form th:action="@{/logout}" method="post">
                 <button type="submit" class="btn btn-secondary btn-icon" aria-label="Se déconnecter" title="Se déconnecter">

@@ -4,6 +4,7 @@ import fr.candidus.entity.Candidature;
 import fr.candidus.enums.StatutCandidature;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
@@ -19,6 +20,11 @@ import java.util.Set;
 public interface CandidatureRepository
         extends JpaRepository<Candidature, Long>,
         JpaSpecificationExecutor<Candidature> {
+
+    /** Supprime toutes les candidatures d'un utilisateur (suppression de son compte). */
+    @Modifying(clearAutomatically = true)
+    @Query("delete from Candidature c where c.utilisateur.id = :utilisateurId")
+    void deleteByUtilisateurId(@Param("utilisateurId") Long utilisateurId);
 
     /** Une candidature de cet utilisateur, ou vide si elle n'existe pas ou appartient à quelqu'un d'autre. */
     Optional<Candidature> findByIdAndUtilisateurId(Long id, Long utilisateurId);
